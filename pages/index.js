@@ -1,65 +1,105 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React from "react";
+import ReactDOM from "react-dom";
+import Link from "next/link";
+import { Form, Input, Button, Checkbox, Radio } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import "antd/dist/antd.css";
 
-export default function Home() {
+const LoginForm = () => {
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div
+      style={{
+        margin: "auto",
+        width: "33%",
+      }}
+    >
+      <h1
+        style={{
+          margin: "25px 0px",
+          textAlign: "center",
+          textTransform: "uppercase",
+        }}
+      >
+        Course Management Assistant
+      </h1>
+      <Form
+        name="login-form"
+        className="login-form"
+        initialValues={{
+          remember: true,
+        }}
+        onFinish={(values) => {
+          console.log("success:", values);
+        }}
+      >
+        <Form.Item
+          name="role"
+          initialValue="student"
+          button="solid"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
         >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
+          <Radio.Group>
+            <Radio.Button value="student">Student</Radio.Button>
+            <Radio.Button value="teacher">Teacher</Radio.Button>
+            <Radio.Button value="manager">Manager</Radio.Button>
+          </Radio.Group>
+        </Form.Item>
+        <Form.Item
+          name="email"
+          rules={[
+            {
+              required: true,
+              type: "email",
+              message: "The input is not valid E-mail!",
+            },
+          ]}
+        >
+          <Input
+            prefix={<UserOutlined className="site-form-item-icon" />}
+            placeholder="Please input email"
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="password"
+          rules={[
+            {
+              required: true,
+              min: 4,
+              max: 16,
+            },
+          ]}
+        >
+          <Input
+            prefix={<LockOutlined className="site-form-item-icon" />}
+            type="password"
+            placeholder="Please input password"
+          />
+        </Form.Item>
+
+        <Form.Item name="remember" valuePropName="checked" noStyle>
+          <Checkbox>Remember me</Checkbox>
+        </Form.Item>
+
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="login-form-button"
+            style={{ width: "100%", margin: "25px 0px" }}
+          >
+            Sign In
+          </Button>
+          <span> No account? </span>
+          <Link href="">Sign up</Link>
+        </Form.Item>
+      </Form>
     </div>
-  )
-}
+  );
+};
+
+export default LoginForm;
