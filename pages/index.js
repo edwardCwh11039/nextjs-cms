@@ -1,23 +1,29 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Link from "next/link";
-import { Form, Input, Button, Checkbox, Radio } from "antd";
+import { Form, Input, Button, Checkbox, Radio, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import "antd/dist/antd.css";
+import axios from "axios";
+import { AES } from "crypto-js";
 
 const LoginForm = () => {
   return (
     <div
       style={{
-        margin: "auto",
-        width: "33%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+        marginTop: "80px",
+        maxHeight: "100vh",
       }}
     >
       <h1
         style={{
-          margin: "25px 0px",
-          textAlign: "center",
+          width: "35%",
           textTransform: "uppercase",
+          textAlign: "center",
         }}
       >
         Course Management Assistant
@@ -26,15 +32,31 @@ const LoginForm = () => {
         name="login-form"
         className="login-form"
         initialValues={{
-          remember: true,
+          role: "student",
+          email: "",
+          password: "",
         }}
         onFinish={(values) => {
-          console.log("success:", values);
+          console.log(values);
+          axios
+            .post("https://cms.chtoma.com/api/login", {
+              ...values,
+              // encrpyt password
+              password: AES.encrypt(values.password, "cms").toString(),
+            })
+            .then((res) => {
+              localStorage.setItem("cms", res.data.data);
+              //TODO: redirect to dashboard
+            })
+            .catch((err) => {
+              message.error(err.response.data.msg);
+            });
+          //http sent message
         }}
+        style={{ width: "35%" }}
       >
         <Form.Item
           name="role"
-          initialValue="student"
           button="solid"
           rules={[
             {
@@ -53,6 +75,9 @@ const LoginForm = () => {
           rules={[
             {
               required: true,
+              message: "Please input email",
+            },
+            {
               type: "email",
               message: "The input is not valid E-mail!",
             },
@@ -69,8 +94,12 @@ const LoginForm = () => {
           rules={[
             {
               required: true,
+              message: "Please input password",
+            },
+            {
               min: 4,
               max: 16,
+              message: "Password is Invalid",
             },
           ]}
         >
@@ -81,7 +110,7 @@ const LoginForm = () => {
           />
         </Form.Item>
 
-        <Form.Item name="remember" valuePropName="checked" noStyle>
+        <Form.Item name="remember" valuePropName="checked">
           <Checkbox>Remember me</Checkbox>
         </Form.Item>
 
