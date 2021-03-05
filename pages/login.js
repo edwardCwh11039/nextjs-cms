@@ -1,13 +1,13 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import Link from "next/link";
 import { Form, Input, Button, Checkbox, Radio, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import "antd/dist/antd.css";
 import axios from "axios";
 import { AES } from "crypto-js";
+import { useRouter } from "next/router";
 
 const LoginForm = () => {
+  const router = useRouter();
   return (
     <div
       style={{
@@ -30,34 +30,31 @@ const LoginForm = () => {
       </h1>
       <Form
         name="login-form"
-        className="login-form"
         initialValues={{
           role: "student",
           email: "",
           password: "",
         }}
         onFinish={(values) => {
-          console.log(values);
           axios
             .post("https://cms.chtoma.com/api/login", {
               ...values,
-              // encrpyt password
+              // encrypt password
               password: AES.encrypt(values.password, "cms").toString(),
             })
             .then((res) => {
-              localStorage.setItem("cms", res.data.data);
+              localStorage.setItem("cms", JSON.stringify(res.data.data));
               //TODO: redirect to dashboard
+              router.push("/dashboard");
             })
             .catch((err) => {
               message.error(err.response.data.msg);
             });
-          //http sent message
         }}
         style={{ width: "35%" }}
       >
         <Form.Item
           name="role"
-          button="solid"
           rules={[
             {
               required: true,
@@ -123,8 +120,10 @@ const LoginForm = () => {
           >
             Sign In
           </Button>
-          <span> No account? </span>
-          <Link href="">Sign up</Link>
+          <div>
+            <span> No account? </span>
+            <Link href="">Sign up</Link>
+          </div>
         </Form.Item>
       </Form>
     </div>

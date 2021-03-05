@@ -14,3 +14,28 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.icon {
+  font-size: 18px;
+  color: #fff !important;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.icon:hover {
+  color: #1890ff !important;
+}
+
+.styledHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
