@@ -1,14 +1,5 @@
-import React, { useState } from "react";
-import {
-  Layout,
-  Menu,
-  Badge,
-  Row,
-  Dropdown,
-  Tabs,
-  Col,
-  Breadcrumb,
-} from "antd";
+import React, { useState } from 'react';
+import { Layout, Menu, Badge, Row, Dropdown, Col, Breadcrumb } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -19,10 +10,11 @@ import {
   BellOutlined,
   UserOutlined,
   LogoutOutlined,
-} from "@ant-design/icons";
-import Avatar from "antd/lib/avatar/avatar";
-import { useRouter } from "next/router";
-import Link from "next/link";
+} from '@ant-design/icons';
+import Avatar from 'antd/lib/avatar/avatar';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import Overview from './overview';
 
 const { Header, Sider, Content } = Layout;
 
@@ -32,16 +24,19 @@ const DashBoard = () => {
   const [collapsed, toggleCollapsed] = useState(false);
 
   return (
-    <Layout style={{ height: "100vh" }}>
+    <Layout style={{ height: '100vh' }}>
       <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={(collapsed) => toggleCollapsed(collapsed)}
       >
-          //Todo: LOGO
-        <div className="logo" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
+        {/* //Todo LOGO */}
+        <div className="logo"></div>
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
           <Menu.Item key="1" icon={<DashboardOutlined />} className="icon">
+            {/* <Link href="/dashboard/overview" replace>
+              Overview
+            </Link> */}
             Overview
           </Menu.Item>
           <Menu.Item key="2" icon={<ReadOutlined />} className="icon">
@@ -57,44 +52,51 @@ const DashBoard = () => {
       </Sider>
       <Layout>
         <Header className="styledHeader">
-          {React.createElement(
-            collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
-            {
-              className: "icon",
-              onClick: () => toggleCollapsed(!collapsed),
-            }
-          )}
+          {/* //* 更新写法 */}
+          {/* {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+            className: 'icon',
+            onClick: () => toggleCollapsed(!collapsed),
+          })} */}
+          <span className="icon" onClick={() => toggleCollapsed(!collapsed)}>
+            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </span>
           <Row align="middle" justify="end" justify="space-between">
             <Col span={4}>
               <Badge className="icon" size="small" count={5} offset={[10, 0]}>
-                  //Todo: overlay need more data
                 <Dropdown
                   overlayStyle={{
-                    background: "#fff",
+                    background: '#fff',
                     borderRadius: 4,
                     width: 400,
                     height: 500,
-                    overflow: "hidden",
+                    overflow: 'hidden',
                   }}
                   placement="bottomRight"
-                  trigger={["click"]}
-                  overlay={<Tabs></Tabs>}
+                  trigger={['click']}
+                  overlay={
+                    <Menu>
+                      <Menu.Item key="mail">Navigation One</Menu.Item>
+                      <Menu.Item key="app">Navigation Two</Menu.Item>
+                    </Menu>
+                  } //! Overlay WHAT!
                 >
-                  <BellOutlined style={{ fontSize: "24px", marginTop: "5" }} />
+                  <BellOutlined
+                    style={{ fontSize: '24px', marginTop: '5px' }}
+                  />
                 </Dropdown>
               </Badge>
             </Col>
             <Col span={4}>
-                //Todo: check profile? && picture
+              {/* //? check profile? && picture */}
               <Dropdown
                 overlay={
                   <Menu>
                     <Menu.Item
-                    //* Erase data from local storage
-                    //* Redirect to Login Page / others
+                      //* Erase data from local storage
+                      //* Redirect to Login Page / others
                       onClick={() => {
-                        localStorage.removeItem("cms");
-                        router.push("/login");
+                        localStorage.removeItem('cms');
+                        router.push('/login');
                       }}
                     >
                       <LogoutOutlined />
@@ -109,13 +111,15 @@ const DashBoard = () => {
             </Col>
           </Row>
         </Header>
-        <Breadcrumb style={{ margin: "0 16px", padding: 16 }}>
+        <Breadcrumb style={{ margin: '0 16px', padding: 16 }}>
           <Breadcrumb.Item key={path}>
             <Link href={path}>CMS SYSTEM</Link>
           </Breadcrumb.Item>
         </Breadcrumb>
-        //Todo: how to swap the content when I select another from Sider
-        <Content></Content>
+        {/* //? how to swap the content when I select another from Sider */}
+        <Content>
+          <Overview></Overview>
+        </Content>
       </Layout>
     </Layout>
   );
