@@ -1,28 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Pagination } from 'antd';
+import { Table, Space, Input, message } from 'antd';
+import { AudioOutlined } from '@ant-design/icons';
 import { formatDistanceToNow } from 'date-fns';
 import axios from 'axios';
 
+const { Search } = Input;
+
+const suffix = (
+  <AudioOutlined
+    style={{
+      fontSize: 16,
+      color: '#1890ff',
+    }}
+  />
+);
+
 const Overview = () => {
   const [data, setData] = useState([]);
+  const [paginator, setPaginator] = useState({
+    page: 1,
+    limit: 20,
+  });
+  const [total, setTotal] = useState(0);
+  const [query, setQuery] = useState(`page=${paginator.page}&limit=${paginator.limit}`);
 
   const countries = ['China', 'New Zealand', 'Canada', 'Australia'];
   const student_types = ['developer', 'tester'];
 
-  var page = 1;
-  var limit = 20;
-
-  const fetchData = (inputPage, inputLimit) => {
-    page = inputPage;
-    limit = inputLimit;
+  const fetchData = () => {
     const storage = JSON.parse(localStorage.getItem('cms'));
     axios
-      .get(`http://localhost:3001/api/students?page=${page}&limit=${limit}`, {
+      .get(`http://localhost:3001/api/students?${query}`, {
         headers: { Authorization: 'Bearer ' + storage.token },
       })
       .then((res) => {
-        const converted_response = JSON.parse(JSON.stringify(res.data.data));
-        setData(converted_response);
+        const data = JSON.parse(JSON.stringify(res.data.data));
+        setTotal(data.total);
+        setData(data.students);
       })
       .catch((err) => {
         console.log(err);
@@ -30,10 +44,10 @@ const Overview = () => {
   };
 
   useEffect(() => {
-    fetchData(page, limit);
-  }, []);
+    fetchData();
+  }, [query]);
 
-  const dataSource = data.students;
+  const dataSource = data;
 
   const columns = [
     {
@@ -98,19 +112,33 @@ const Overview = () => {
 
   return (
     <div>
+      <Space direction="vertical">
+        <Search
+          placeholder="Search by name"
+          onSearch={(value) =>
+            value
+              ? setQuery(
+                  `query=${value}&page=${paginator.page}&limit=${paginator.limit}`
+                )
+              : message.error('Empty input!')
+          }
+          enterButton
+        />
+      </Space>
       <Table
         dataSource={dataSource}
         columns={columns}
         pagination={{
-          defaultCurrent: page,
-          pageSize: limit,
-          total: data.total,
+          ...paginator,
+          total,
         }}
-        onChange={(pagination, filters, sorter) => {
-          console.log(pagination);
-          console.log(filters);
-          console.log(sorter);
-          fetchData(pagination.current, pagination.pageSize);
+        onChange={(pagination) => {
+          setPaginator((prevState) => ({
+            ...prevState,
+            page: pagination.current,
+            limit: pagination.pageSize,
+          }));
+          setQuery(`page=${paginator.page}&limit=${paginator.limit}`);
         }}
       />
       ;
