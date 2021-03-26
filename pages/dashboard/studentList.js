@@ -103,7 +103,6 @@ const studentList = () => {
       title: 'Action',
       dataIndex: 'action',
       render: (text, record, index) => (
-        //Todo: edit 和 delete 需要下一步动作
         <Space size="middle">
           <TextLink
             onClick={() => {
@@ -115,7 +114,24 @@ const studentList = () => {
           </TextLink>
           <Popconfirm
             title="Are you sure to delete?"
-            onconfirm={(e) => console.log(e)}
+            onConfirm={() => {
+              const storage = JSON.parse(localStorage.getItem('cms'));
+              axios
+                .delete(`http://localhost:3001/api/students/${record.id}`, {
+                  headers: { Authorization: 'Bearer ' + storage.token },
+                })
+                .then((res) => {
+                  if (res.data.data) {
+                    const index = data.findIndex(
+                      (item) => item.id === record.id
+                    );
+                    const updatedData = [...data];
+                    updatedData.splice(index, 1);
+                    setData(updatedData);
+                    setTotal(total - 1);
+                  }
+                });
+            }}
             okText="Yes"
             cancelText="No"
           >
