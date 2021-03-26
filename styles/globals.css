@@ -1,3 +1,4 @@
+
 html,
 body {
   padding: 0;
@@ -16,9 +17,17 @@ a {
 }
 
 .logo {
-  height: 32px;
-  margin: 16px;
-  background: rgba(255, 255, 255, 0.3);
+  height: 64px;
+  display: inline-flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #fff;
+  letter-spacing: 5px;
+  text-shadow: 5px 1px 5px;
+  transform: rotateX(45deg);
+  font-family: monospace;
 }
 .icon {
   font-size: 18px;
@@ -38,4 +47,10 @@ a {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+.content-style {
+  margin: 16px;
+  background-color: #fff;
+  padding: 16px;
+  min-height: auto;
 }

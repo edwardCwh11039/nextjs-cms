@@ -1,53 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Input, message } from 'antd';
+import { Table, Space, Input, message, Button, Modal, Popconfirm } from 'antd';
+import TextLink from 'antd/lib/typography/Link';
 import { AudioOutlined } from '@ant-design/icons';
 import { formatDistanceToNow } from 'date-fns';
 import axios from 'axios';
+import { debounce } from 'lodash';
+import DashBoard from './index';
+import StudentForm from './studentForm';
 
 const { Search } = Input;
 
-const suffix = (
-  <AudioOutlined
-    style={{
-      fontSize: 16,
-      color: '#1890ff',
-    }}
-  />
-);
-
-const Overview = () => {
+const studentList = () => {
   const [data, setData] = useState([]);
   const [paginator, setPaginator] = useState({
     page: 1,
     limit: 20,
   });
   const [total, setTotal] = useState(0);
-  const [query, setQuery] = useState(`page=${paginator.page}&limit=${paginator.limit}`);
+  const [query, setQuery] = useState('');
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editStudent, setEditStudent] = useState(null);
+
+  //filtering
   const countries = ['China', 'New Zealand', 'Canada', 'Australia'];
   const student_types = ['developer', 'tester'];
 
   const fetchData = () => {
+    const { page, limit } = paginator;
     const storage = JSON.parse(localStorage.getItem('cms'));
     axios
-      .get(`http://localhost:3001/api/students?${query}`, {
-        headers: { Authorization: 'Bearer ' + storage.token },
-      })
+      .get(
+        `http://localhost:3001/api/students?query=${query}&page=${page}&limit=${limit}`,
+        {
+          headers: { Authorization: 'Bearer ' + storage.token },
+        }
+      )
       .then((res) => {
         const data = JSON.parse(JSON.stringify(res.data.data));
         setTotal(data.total);
         setData(data.students);
       })
       .catch((err) => {
-        console.log(err);
+        message.error(err.response.data.msg);
       });
   };
 
   useEffect(() => {
     fetchData();
-  }, [query]);
-
-  const dataSource = data;
+  }, [paginator, query]);
 
   const columns = [
     {
@@ -66,7 +67,7 @@ const Overview = () => {
           ? 0
           : -1;
       },
-      render: (text) => <a>{text}</a>,
+      render: (text) => <a>{text}</a>, //Todo: link path
     },
     {
       title: 'Area',
@@ -100,33 +101,58 @@ const Overview = () => {
     },
     {
       title: 'Action',
-      key: 'action',
-      render: () => (
+      dataIndex: 'action',
+      render: (text, record, index) => (
+        //Todo: edit 和 delete 需要下一步动作
         <Space size="middle">
-          <a>Edit</a>
-          <a>Delete</a>
+          <TextLink
+            onClick={() => {
+              setEditStudent(record);
+              setIsModalVisible(true);
+            }}
+          >
+            Edit
+          </TextLink>
+          <Popconfirm
+            title="Are you sure to delete?"
+            onconfirm={(e) => console.log(e)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <a>Delete</a>
+          </Popconfirm>
         </Space>
       ),
     },
   ];
 
+  const updateQuery = debounce(setQuery, 1000);
+
+  const cancel = () => {
+    setIsModalVisible(false);
+    setEditStudent(null);
+  };
+
   return (
-    <div>
-      <Space direction="vertical">
+    <DashBoard>
+      <Space>
+        <Button
+          type="primary"
+          onClick={() => {
+            setIsModalVisible(true);
+            setEditStudent(null);
+          }}
+        >
+          Add
+        </Button>
         <Search
           placeholder="Search by name"
-          onSearch={(value) =>
-            value
-              ? setQuery(
-                  `query=${value}&page=${paginator.page}&limit=${paginator.limit}`
-                )
-              : message.error('Empty input!')
-          }
-          enterButton
+          onSearch={(value) => setQuery(value)}
+          onChange={(event) => updateQuery(event.target.value)}
         />
       </Space>
       <Table
-        dataSource={dataSource}
+        dataSource={data}
         columns={columns}
         pagination={{
           ...paginator,
@@ -138,11 +164,30 @@ const Overview = () => {
             page: pagination.current,
             limit: pagination.pageSize,
           }));
-          setQuery(`page=${paginator.page}&limit=${paginator.limit}`);
         }}
       />
-      ;
-    </div>
+      <Modal
+        title={editStudent ? 'Edit Student' : 'Add Student'}
+        destroyOnClose={true}
+        maskClosable={false}
+        centered
+        visible={isModalVisible}
+        onCancel={cancel}
+        footer={[
+          <Button key="cancel" onClick={cancel}>
+            Cancel
+          </Button>,
+        ]}
+      >
+        <StudentForm
+          student={editStudent}
+          onFinish={(student) => {
+            console.log(student);
+            setIsModalVisible(false);
+          }}
+        ></StudentForm>
+      </Modal>
+    </DashBoard>
   );
 };
-export default Overview;
+export default studentList;

@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Badge, Row, Dropdown, Col, Breadcrumb } from 'antd';
+import {
+  Layout,
+  Menu,
+  Badge,
+  Row,
+  Dropdown,
+  Col,
+  Breadcrumb,
+  message,
+} from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -14,33 +23,37 @@ import {
 import Avatar from 'antd/lib/avatar/avatar';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Overview from './overview';
+import axios from 'axios';
 
 const { Header, Sider, Content } = Layout;
 
-const DashBoard = () => {
+const DashBoard = (props) => {
+  const { children } = props;
   const router = useRouter();
   const path = router.pathname;
   const [collapsed, toggleCollapsed] = useState(false);
 
   return (
-    <Layout style={{ height: '100vh' }}>
+    <Layout>
       <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={(collapsed) => toggleCollapsed(collapsed)}
       >
-        {/* //Todo LOGO */}
-        <div className="logo"></div>
+        //*Logo
+        <div className="logo">
+          <Link href="/">
+            <span style={{ color: '#fff', cursor: 'pointer' }}>CMS</span>
+          </Link>
+        </div>
+        //Todo 根据不同职位 做些调整
         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
           <Menu.Item key="1" icon={<DashboardOutlined />} className="icon">
-            {/* <Link href="/dashboard/overview" replace>
-              Overview
-            </Link> */}
+            {/* <Link href="/dashboard/overview">Overview</Link> */}
             Overview
           </Menu.Item>
           <Menu.Item key="2" icon={<ReadOutlined />} className="icon">
-            Course
+            <Link href="/dashboard/studentList">Student List</Link>
           </Menu.Item>
           <Menu.Item key="3" icon={<CalendarOutlined />} className="icon">
             Class Schedule
@@ -52,11 +65,6 @@ const DashBoard = () => {
       </Sider>
       <Layout>
         <Header className="styledHeader">
-          {/* //* 更新写法 */}
-          {/* {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-            className: 'icon',
-            onClick: () => toggleCollapsed(!collapsed),
-          })} */}
           <span className="icon" onClick={() => toggleCollapsed(!collapsed)}>
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </span>
@@ -92,11 +100,25 @@ const DashBoard = () => {
                 overlay={
                   <Menu>
                     <Menu.Item
-                      //* Erase data from local storage
-                      //* Redirect to Login Page / others
+                      //* log out api
+                      //* clear the local storage
+                      //* Redirect to Login Page
                       onClick={() => {
-                        localStorage.removeItem('cms');
-                        router.push('/login');
+                        const storage = JSON.parse(localStorage.getItem('cms'));
+                        axios
+                          .post('http://localhost:3001/api/logout', null, {
+                            headers: {
+                              Authorization: 'Bearer ' + storage.token,
+                            },
+                          })
+                          .then((res) => {
+                            message.success(res.msg);
+                            localStorage.removeItem('cms');
+                            router.push('/login');
+                          })
+                          .catch((err) => {
+                            message.error(err.response.data.msg);
+                          });
                       }}
                     >
                       <LogoutOutlined />
@@ -111,15 +133,13 @@ const DashBoard = () => {
             </Col>
           </Row>
         </Header>
+        {/* //Todo 重做 */}
         <Breadcrumb style={{ margin: '0 16px', padding: 16 }}>
           <Breadcrumb.Item key={path}>
             <Link href={path}>CMS SYSTEM</Link>
           </Breadcrumb.Item>
         </Breadcrumb>
-        {/* //? how to swap the content when I select another from Sider */}
-        <Content>
-          <Overview></Overview>
-        </Content>
+        <Content className="content-style">{children}</Content>
       </Layout>
     </Layout>
   );
