@@ -2,7 +2,7 @@ import { Button, Form, Input, Select, message } from 'antd';
 import React from 'react';
 import axios from 'axios';
 
-const StudentForm = (props) => {
+const ModalForm = (props) => {
   const [form] = Form.useForm();
   const { student, onFinish } = props;
   const countries = ['China', 'New Zealand', 'Canada', 'Australia'];
@@ -27,15 +27,22 @@ const StudentForm = (props) => {
 
         if (student) {
           axios
-            .post('http://localhost:3001/api/students/update', {
-              ...values,
-              id: 1,
-            })
+            .put(
+              'http://localhost:3001/api/students',
+              {
+                ...values,
+                id: student.id,
+              },
+              {
+                headers: { Authorization: 'Bearer ' + storage.token },
+              }
+            )
             .then((res) => {
-              console.log(res);
+              message.success(res.data.msg);
+              onFinish();
             })
             .catch((err) => {
-              console.log(err);
+              message.error(err.response.data.msg);
             });
         } else {
           axios
@@ -44,15 +51,13 @@ const StudentForm = (props) => {
             })
             .then((res) => {
               message.success(res.data.msg);
-              onFinish(res.data.data)
+              onFinish();
             })
             .catch((err) => {
               message.error(err.response.data.msg);
             });
         }
-        console.log(student ? 'true' : 'false');
-        console.log(values);
-        onFinish(values);
+        onFinish();
       }}
       initialValues={{
         name: student?.name,
@@ -99,4 +104,4 @@ const StudentForm = (props) => {
   );
 };
 
-export default StudentForm;
+export default ModalForm;

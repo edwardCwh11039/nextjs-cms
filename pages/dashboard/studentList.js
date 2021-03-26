@@ -6,7 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 import axios from 'axios';
 import { debounce } from 'lodash';
 import DashBoard from './index';
-import StudentForm from './studentForm';
+import ModalForm from './modalForm';
 
 const { Search } = Input;
 
@@ -67,7 +67,7 @@ const studentList = () => {
           ? 0
           : -1;
       },
-      render: (text) => <a>{text}</a>, //Todo: link path
+      render: (text) => <a>{text}</a>,
     },
     {
       title: 'Area',
@@ -112,6 +112,7 @@ const studentList = () => {
           >
             Edit
           </TextLink>
+          {/* //* 删除student //* 同时更新图表 */}
           <Popconfirm
             title="Are you sure to delete?"
             onConfirm={() => {
@@ -182,6 +183,9 @@ const studentList = () => {
           }));
         }}
       />
+
+      {/* //*单独一个组件
+      //* 只有按Add 或者Edit 时候才会出现 （visible) */}
       <Modal
         title={editStudent ? 'Edit Student' : 'Add Student'}
         destroyOnClose={true}
@@ -195,13 +199,15 @@ const studentList = () => {
           </Button>,
         ]}
       >
-        <StudentForm
+        {/* //*更新student list 
+      //*增加student */}
+        <ModalForm
           student={editStudent}
-          onFinish={(student) => {
-            console.log(student);
+          onFinish={() => {
+            fetchData();
             setIsModalVisible(false);
           }}
-        ></StudentForm>
+        ></ModalForm>
       </Modal>
     </DashBoard>
   );
