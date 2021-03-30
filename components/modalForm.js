@@ -81,8 +81,8 @@ const ModalForm = (props) => {
           ))}
         </Select>
       </Form.Item>
-      <Form.Item name="type" label="Student Type" rules={[{ required: true }]}>
-        <Select defaultValue={student?.type.id}>
+      <Form.Item name="typeId" label="Student Type" rules={[{ required: true }]}>
+        <Select>
           {Object.keys(student_types).map((key) => (
             <Select.Option value={key}>{student_types[key]}</Select.Option>
           ))}
