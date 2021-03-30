@@ -1,21 +1,9 @@
 import React, { useState } from 'react';
-import {
-  Layout,
-  Menu,
-  Badge,
-  Row,
-  Dropdown,
-  Col,
-  Breadcrumb,
-  message,
-} from 'antd';
+import { Layout, Menu, Badge, Row, Dropdown, Breadcrumb, message } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  DashboardOutlined,
   ReadOutlined,
-  CalendarOutlined,
-  MessageOutlined,
   BellOutlined,
   UserOutlined,
   LogoutOutlined,
@@ -34,32 +22,20 @@ const DashBoard = (props) => {
   const [collapsed, toggleCollapsed] = useState(false);
 
   return (
-    <Layout>
+    <Layout style={{ height: '100vh' }}>
       <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={(collapsed) => toggleCollapsed(collapsed)}
       >
-        //*Logo
         <div className="logo">
           <Link href="/">
             <span style={{ color: '#fff', cursor: 'pointer' }}>CMS</span>
           </Link>
         </div>
-        //Todo 根据不同职位 做些调整
         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-          <Menu.Item key="1" icon={<DashboardOutlined />} className="icon">
-            {/* <Link href="/dashboard/overview">Overview</Link> */}
-            Overview
-          </Menu.Item>
           <Menu.Item key="2" icon={<ReadOutlined />} className="icon">
             <Link href="/dashboard/studentList">Student List</Link>
-          </Menu.Item>
-          <Menu.Item key="3" icon={<CalendarOutlined />} className="icon">
-            Class Schedule
-          </Menu.Item>
-          <Menu.Item key="4" icon={<MessageOutlined />} className="icon">
-            Message
           </Menu.Item>
         </Menu>
       </Sider>
@@ -68,9 +44,9 @@ const DashBoard = (props) => {
           <span className="icon" onClick={() => toggleCollapsed(!collapsed)}>
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </span>
-          <Row align="middle" justify="end" justify="space-between">
-            <Col span={4}>
-              <Badge className="icon" size="small" count={5} offset={[10, 0]}>
+          <Row align="middle">
+            <Badge size="small" count={5} offset={[10, 0]}>
+              <div className="icon">
                 <Dropdown
                   overlayStyle={{
                     background: '#fff',
@@ -91,11 +67,10 @@ const DashBoard = (props) => {
                   <BellOutlined
                     style={{ fontSize: '24px', marginTop: '5px' }}
                   />
-                </Dropdown>
-              </Badge>
-            </Col>
-            <Col span={4}>
-              {/* //? check profile? && picture */}
+                </Dropdown>{' '}
+              </div>
+            </Badge>
+            <div className="icon" style={{ marginLeft: '2em' }}>
               <Dropdown
                 overlay={
                   <Menu>
@@ -130,10 +105,10 @@ const DashBoard = (props) => {
               >
                 <Avatar icon={<UserOutlined />} />
               </Dropdown>
-            </Col>
+            </div>
           </Row>
         </Header>
-        {/* //Todo 重做 */}
+
         <Breadcrumb style={{ margin: '0 16px', padding: 16 }}>
           <Breadcrumb.Item key={path}>
             <Link href={path}>CMS SYSTEM</Link>

@@ -1,19 +1,30 @@
+@import '~antd/dist/antd.less';
 
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+.amap-logo,
+.amap-copyright {
+  display: none !important;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+#user-amap-container .amap-info-close {
+  display: none !important;
 }
 
-* {
-  box-sizing: border-box;
+#user-amap-container .amap-info-content {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+#user-amap-container .amap-info-sharp,
+#user-amap-container .amap-info-sharp::after {
+  border-top-color: rgba(0, 0, 0, 0.2);
+}
+
+.ant-affix {
+  z-index: 99;
+}
+
+.ant-carousel .slick-dots li {
+  height: 3px !important;
 }
 
 .logo {
@@ -53,4 +64,5 @@ a {
   background-color: #fff;
   padding: 16px;
   min-height: auto;
+  overflow: auto;
 }

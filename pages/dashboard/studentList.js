@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Space, Input, message, Button, Modal, Popconfirm } from 'antd';
 import TextLink from 'antd/lib/typography/Link';
-import { AudioOutlined } from '@ant-design/icons';
 import { formatDistanceToNow } from 'date-fns';
 import axios from 'axios';
 import { debounce } from 'lodash';
 import DashBoard from './index';
-import ModalForm from './modalForm';
+import ModalForm from '../../components/modalForm';
+import { student_types } from '../../lib/constant/config';
 
 const { Search } = Input;
 
-const studentList = () => {
+export async function getStaticProps() {
+  const res = await axios.get('http://localhost:3001/api/countries');
+  const countries = await JSON.parse(JSON.stringify(res.data.data));
+
+  return { props: { countries } };
+}
+
+const studentList = ({ countries }) => {
   const [data, setData] = useState([]);
   const [paginator, setPaginator] = useState({
     page: 1,
@@ -21,10 +28,6 @@ const studentList = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editStudent, setEditStudent] = useState(null);
-
-  //filtering
-  const countries = ['China', 'New Zealand', 'Canada', 'Australia'];
-  const student_types = ['developer', 'tester'];
 
   const fetchData = () => {
     const { page, limit } = paginator;
@@ -38,8 +41,13 @@ const studentList = () => {
       )
       .then((res) => {
         const data = JSON.parse(JSON.stringify(res.data.data));
+        const students = data.students.map((student) => ({
+          ...student,
+          key: student.id,
+        }));
+
         setTotal(data.total);
-        setData(data.students);
+        setData(students);
       })
       .catch((err) => {
         message.error(err.response.data.msg);
@@ -61,11 +69,10 @@ const studentList = () => {
       dataIndex: 'name',
       sortDirections: ['ascend', 'descend'],
       sorter: (pre, next) => {
-        return pre.name[0] > next.name[0]
-          ? 1
-          : pre.name[0] === next.name[0]
-          ? 0
-          : -1;
+        pre = pre.name.charCodeAt(0);
+        next = next.name.charCodeAt(0);
+
+        return pre > next ? 1 : pre === next ? 0 : -1;
       },
       render: (text) => <a>{text}</a>,
     },
@@ -73,7 +80,10 @@ const studentList = () => {
       title: 'Area',
       dataIndex: 'country',
       width: '10%',
-      filters: countries.map((country) => ({ text: country, value: country })),
+      filters: countries.map((country) => ({
+        text: country.en,
+        value: country.en,
+      })),
       onFilter: (value, record) => record.country.includes(value),
     },
     {
@@ -89,7 +99,10 @@ const studentList = () => {
     {
       title: 'Student Type',
       dataIndex: 'type',
-      filters: student_types.map((type) => ({ text: type, value: type })),
+      filters: Object.keys(student_types).map((key) => ({
+        text: student_types[key],
+        value: key,
+      })),
       onFilter: (value, record) => record.type.name === value,
       render: (type) => type?.name,
     },
@@ -143,7 +156,7 @@ const studentList = () => {
     },
   ];
 
-  const updateQuery = debounce(setQuery, 1000);
+  const updateQuery = useCallback(debounce(setQuery, 1000), []);
 
   const cancel = () => {
     setIsModalVisible(false);
@@ -184,8 +197,6 @@ const studentList = () => {
         }}
       />
 
-      {/* //*单独一个组件
-      //* 只有按Add 或者Edit 时候才会出现 （visible) */}
       <Modal
         title={editStudent ? 'Edit Student' : 'Add Student'}
         destroyOnClose={true}
@@ -199,14 +210,14 @@ const studentList = () => {
           </Button>,
         ]}
       >
-        {/* //*更新student list 
-      //*增加student */}
         <ModalForm
           student={editStudent}
           onFinish={() => {
             fetchData();
             setIsModalVisible(false);
           }}
+          countries={countries}
+          student_types={student_types}
         ></ModalForm>
       </Modal>
     </DashBoard>

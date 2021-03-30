@@ -44,7 +44,6 @@ const LoginForm = () => {
             })
             .then((res) => {
               localStorage.setItem('cms', JSON.stringify(res.data.data));
-              //TODO: redirect to dashboard
               router.push('/dashboard');
             })
             .catch((err) => {

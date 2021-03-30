@@ -4,8 +4,7 @@ import axios from 'axios';
 
 const ModalForm = (props) => {
   const [form] = Form.useForm();
-  const { student, onFinish } = props;
-  const countries = ['China', 'New Zealand', 'Canada', 'Australia'];
+  const { student, onFinish, countries, student_types } = props;
   const validateMessages = {
     required: "'${name}' is required",
     types: {
@@ -75,17 +74,18 @@ const ModalForm = (props) => {
       </Form.Item>
       <Form.Item name="country" label="Area" rules={[{ required: true }]}>
         <Select>
-          {countries.map((item, index) => (
-            <Select.Option value={item} key={index}>
-              {item}
+          {countries.map((country) => (
+            <Select.Option value={country.en} key={country.en}>
+              {country.en}
             </Select.Option>
           ))}
         </Select>
       </Form.Item>
       <Form.Item name="type" label="Student Type" rules={[{ required: true }]}>
         <Select>
-          <Select.Option value={1}>Tester</Select.Option>
-          <Select.Option value={2}>Developer</Select.Option>
+          {Object.keys(student_types).map((key) => (
+            <Select.Option value={key}>{student_types[key]}</Select.Option>
+          ))}
         </Select>
       </Form.Item>
       <Form.Item
