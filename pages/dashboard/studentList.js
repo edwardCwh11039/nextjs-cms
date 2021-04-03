@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Space, Input, message, Button, Modal, Popconfirm } from 'antd';
+import { Table, Space, Input, Button, Modal, Popconfirm } from 'antd';
 import TextLink from 'antd/lib/typography/Link';
 import { formatDistanceToNow } from 'date-fns';
-import axios from 'axios';
+import Link from 'next/link';
 import { debounce } from 'lodash';
 import DashBoard from './index';
 import ModalForm from '../../components/modalForm';
 import { student_types } from '../../lib/constant/config';
+import apiServices from '../../lib/services/api-services';
 
 const { Search } = Input;
 
 export async function getStaticProps() {
-  const res = await axios.get('http://localhost:3001/api/countries');
-  const countries = await JSON.parse(JSON.stringify(res.data.data));
+  const countries = await apiServices.getCountries().then((res) => {
+    const data = JSON.parse(JSON.stringify(res.data));
+    return data;
+  });
 
   return { props: { countries } };
 }
@@ -31,27 +34,16 @@ const studentList = ({ countries }) => {
 
   const fetchData = () => {
     const { page, limit } = paginator;
-    const storage = JSON.parse(localStorage.getItem('cms'));
-    axios
-      .get(
-        `http://localhost:3001/api/students?query=${query}&page=${page}&limit=${limit}`,
-        {
-          headers: { Authorization: 'Bearer ' + storage.token },
-        }
-      )
-      .then((res) => {
-        const data = JSON.parse(JSON.stringify(res.data.data));
-        const students = data.students.map((student) => ({
-          ...student,
-          key: student.id,
-        }));
+    apiServices.getStudents(query, page, limit).then((res) => {
+      const data = JSON.parse(JSON.stringify(res.data));
+      const students = data.students.map((student) => ({
+        ...student,
+        key: student.id,
+      }));
 
-        setTotal(data.total);
-        setData(students);
-      })
-      .catch((err) => {
-        message.error(err.response.data.msg);
-      });
+      setTotal(data.total);
+      setData(students);
+    });
   };
 
   useEffect(() => {
@@ -74,7 +66,9 @@ const studentList = ({ countries }) => {
 
         return pre > next ? 1 : pre === next ? 0 : -1;
       },
-      render: (text) => <a>{text}</a>,
+      render: (_, record) => (
+        <Link href={`/dashboard/${record.id}`}>{record.name}</Link>
+      ),
     },
     {
       title: 'Area',
@@ -115,7 +109,7 @@ const studentList = ({ countries }) => {
     {
       title: 'Action',
       dataIndex: 'action',
-      render: (text, record, index) => (
+      render: (_, record) => (
         <Space size="middle">
           <TextLink
             onClick={() => {
@@ -129,22 +123,15 @@ const studentList = ({ countries }) => {
           <Popconfirm
             title="Are you sure to delete?"
             onConfirm={() => {
-              const storage = JSON.parse(localStorage.getItem('cms'));
-              axios
-                .delete(`http://localhost:3001/api/students/${record.id}`, {
-                  headers: { Authorization: 'Bearer ' + storage.token },
-                })
-                .then((res) => {
-                  if (res.data.data) {
-                    const index = data.findIndex(
-                      (item) => item.id === record.id
-                    );
-                    const updatedData = [...data];
-                    updatedData.splice(index, 1);
-                    setData(updatedData);
-                    setTotal(total - 1);
-                  }
-                });
+              apiServices.deleteStudents(record.id).then((res) => {
+                if (res.data) {
+                  const index = data.findIndex((item) => item.id === record.id);
+                  const updatedData = [...data];
+                  updatedData.splice(index, 1);
+                  setData(updatedData);
+                  setTotal(total - 1);
+                }
+              });
             }}
             okText="Yes"
             cancelText="No"
@@ -185,8 +172,10 @@ const studentList = ({ countries }) => {
         dataSource={data}
         columns={columns}
         pagination={{
-          ...paginator,
           total,
+          current: paginator.page,
+          pageSize: paginator.limit,
+          showSizeChanger: true,
         }}
         onChange={(pagination) => {
           setPaginator((prevState) => ({
@@ -212,8 +201,14 @@ const studentList = ({ countries }) => {
       >
         <ModalForm
           student={editStudent}
-          onFinish={() => {
-            fetchData();
+          onFinish={(student) => {
+            console.log(student, editStudent);
+            if (editStudent) {
+              const index = data.findIndex((item) => item.id === student.id);
+
+              data[index] = student;
+              setData([...data]);
+            }
             setIsModalVisible(false);
           }}
           countries={countries}

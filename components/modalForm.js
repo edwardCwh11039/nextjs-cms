@@ -1,6 +1,6 @@
 import { Button, Form, Input, Select, message } from 'antd';
 import React from 'react';
-import axios from 'axios';
+import apiServices from '../lib/services/api-services';
 
 const ModalForm = (props) => {
   const [form] = Form.useForm();
@@ -22,41 +22,20 @@ const ModalForm = (props) => {
       name="basic"
       initialValues={{ remember: true }}
       onFinish={(values) => {
-        const storage = JSON.parse(localStorage.getItem('cms'));
-
         if (student) {
-          axios
-            .put(
-              'http://localhost:3001/api/students',
-              {
-                ...values,
-                id: student.id,
-              },
-              {
-                headers: { Authorization: 'Bearer ' + storage.token },
-              }
-            )
-            .then((res) => {
-              message.success(res.data.msg);
-              onFinish();
+          apiServices
+            .editStudent({
+              ...values,
+              id: student.id,
             })
-            .catch((err) => {
-              message.error(err.response.data.msg);
+            .then((res) => {
+              onFinish(res.data);
             });
         } else {
-          axios
-            .post('http://localhost:3001/api/students', values, {
-              headers: { Authorization: 'Bearer ' + storage.token },
-            })
-            .then((res) => {
-              message.success(res.data.msg);
-              onFinish();
-            })
-            .catch((err) => {
-              message.error(err.response.data.msg);
-            });
+          apiServices.addStudent(values).then((res) => {
+            onFinish(res.data);
+          });
         }
-        onFinish();
       }}
       initialValues={{
         name: student?.name,
@@ -72,6 +51,7 @@ const ModalForm = (props) => {
       <Form.Item label="Email" name="email" rules={[{ required: true }]}>
         <Input type="email" placeholder="email" />
       </Form.Item>
+
       <Form.Item name="country" label="Area" rules={[{ required: true }]}>
         <Select>
           {countries.map((country) => (
@@ -81,13 +61,21 @@ const ModalForm = (props) => {
           ))}
         </Select>
       </Form.Item>
-      <Form.Item name="typeId" label="Student Type" rules={[{ required: true }]}>
+
+      <Form.Item
+        name="typeId"
+        label="Student Type"
+        rules={[{ required: true }]}
+      >
         <Select>
           {Object.keys(student_types).map((key) => (
-            <Select.Option value={key}>{student_types[key]}</Select.Option>
+            <Select.Option value={+key} title={student_types[key]}>
+              {student_types[key]}
+            </Select.Option>
           ))}
         </Select>
       </Form.Item>
+
       <Form.Item
         style={{
           position: 'absolute',

@@ -1,10 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import { Form, Input, Button, Checkbox, Radio, message } from 'antd';
+import { Form, Input, Button, Checkbox, Radio } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import { AES } from 'crypto-js';
 import { useRouter } from 'next/router';
+import apiServices from '../lib/services/api-services';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -36,19 +35,12 @@ const LoginForm = () => {
           password: '',
         }}
         onFinish={(values) => {
-          axios
-            .post('http://localhost:3001/api/login', {
-              ...values,
-              // encrypt password
-              password: AES.encrypt(values.password, 'cms').toString(),
-            })
-            .then((res) => {
-              localStorage.setItem('cms', JSON.stringify(res.data.data));
+          apiServices.login(values).then(({ data }) => {
+            if (data) {
+              localStorage.setItem('cms', JSON.stringify(data));
               router.push('/dashboard');
-            })
-            .catch((err) => {
-              message.error(err.response.data.msg);
-            });
+            }
+          });
         }}
         style={{ width: '35%' }}
       >
@@ -121,7 +113,7 @@ const LoginForm = () => {
           </Button>
           <div>
             <span> No account? </span>
-            <Link href="">Sign up</Link>
+            <a>Sign up</a>
           </div>
         </Form.Item>
       </Form>

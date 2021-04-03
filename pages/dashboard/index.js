@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Badge, Row, Dropdown, Breadcrumb, message } from 'antd';
+import { Layout, Menu, Badge, Row, Dropdown, Breadcrumb } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -11,7 +11,7 @@ import {
 import Avatar from 'antd/lib/avatar/avatar';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import axios from 'axios';
+import apiServices from '../../lib/services/api-services';
 
 const { Header, Sider, Content } = Layout;
 
@@ -79,21 +79,10 @@ const DashBoard = (props) => {
                       //* clear the local storage
                       //* Redirect to Login Page
                       onClick={() => {
-                        const storage = JSON.parse(localStorage.getItem('cms'));
-                        axios
-                          .post('http://localhost:3001/api/logout', null, {
-                            headers: {
-                              Authorization: 'Bearer ' + storage.token,
-                            },
-                          })
-                          .then((res) => {
-                            message.success(res.msg);
-                            localStorage.removeItem('cms');
-                            router.push('/login');
-                          })
-                          .catch((err) => {
-                            message.error(err.response.data.msg);
-                          });
+                        apiServices.logout().then((res) => {
+                          localStorage.removeItem('cms');
+                          router.push('/login');
+                        });
                       }}
                     >
                       <LogoutOutlined />
