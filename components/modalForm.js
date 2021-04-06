@@ -41,7 +41,7 @@ const ModalForm = (props) => {
         name: student?.name,
         email: student?.email,
         country: student?.country,
-        typeId: student?.type.id,
+        type: student?.type.id,
       }}
     >
       <Form.Item label="Name" name="name" rules={[{ required: true }]}>
@@ -55,21 +55,17 @@ const ModalForm = (props) => {
       <Form.Item name="country" label="Area" rules={[{ required: true }]}>
         <Select>
           {countries.map((country) => (
-            <Select.Option value={country.en} key={country.en}>
+            <Select.Option key={country.en} value={country.en}>
               {country.en}
             </Select.Option>
           ))}
         </Select>
       </Form.Item>
 
-      <Form.Item
-        name="typeId"
-        label="Student Type"
-        rules={[{ required: true }]}
-      >
+      <Form.Item name="type" label="Student Type" rules={[{ required: true }]}>
         <Select>
           {Object.keys(student_types).map((key) => (
-            <Select.Option value={+key} title={student_types[key]}>
+            <Select.Option key={key} value={+key} title={student_types[key]}>
               {student_types[key]}
             </Select.Option>
           ))}

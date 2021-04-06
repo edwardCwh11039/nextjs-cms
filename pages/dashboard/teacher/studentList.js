@@ -4,10 +4,10 @@ import TextLink from 'antd/lib/typography/Link';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { debounce } from 'lodash';
-import DashBoard from './index';
-import ModalForm from '../../components/modalForm';
-import { student_types } from '../../lib/constant/config';
-import apiServices from '../../lib/services/api-services';
+import AppLayout from '../../../components/layout/layout';
+import ModalForm from '../../../components/modalForm';
+import { student_types } from '../../../lib/constant/config';
+import apiServices from '../../../lib/services/api-services';
 
 const { Search } = Input;
 
@@ -151,7 +151,7 @@ const studentList = ({ countries }) => {
   };
 
   return (
-    <DashBoard>
+    <AppLayout>
       <Space>
         <Button
           type="primary"
@@ -202,7 +202,6 @@ const studentList = ({ countries }) => {
         <ModalForm
           student={editStudent}
           onFinish={(student) => {
-            console.log(student, editStudent);
             if (editStudent) {
               const index = data.findIndex((item) => item.id === student.id);
 
@@ -215,7 +214,7 @@ const studentList = ({ countries }) => {
           student_types={student_types}
         ></ModalForm>
       </Modal>
-    </DashBoard>
+    </AppLayout>
   );
 };
 export default studentList;

@@ -1,9 +1,9 @@
 import React from 'react';
-import Link from 'next/link';
 import { Form, Input, Button, Checkbox, Radio } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import apiServices from '../lib/services/api-services';
+import storage from '../lib/services/storage';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -37,8 +37,8 @@ const LoginForm = () => {
         onFinish={(values) => {
           apiServices.login(values).then(({ data }) => {
             if (data) {
-              localStorage.setItem('cms', JSON.stringify(data));
-              router.push('/dashboard');
+              storage.setStorage(data);
+              router.push(`/dashboard/${data.role}`);
             }
           });
         }}
