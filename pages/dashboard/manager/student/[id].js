@@ -1,8 +1,8 @@
 import { Table, Card, Col, Row, Tabs, Tag } from 'antd';
 import Avatar from 'antd/lib/avatar/avatar';
 import React, { useEffect, useState } from 'react';
-import AppLayout from '../../../components/layout/layout';
-import apiServices from '../../../lib/services/api-services';
+import AppLayout from '../../../../components/layout/layout';
+import apiServices from '../../../../lib/services/api-services';
 
 export async function getServerSideProps(context) {
   const { id } = context.params;

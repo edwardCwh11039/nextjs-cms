@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import apiServices from '../../lib/services/api-services';
 import storage from '../../lib/services/storage';
 import AppBreadCrumb from './breadcrumb';
+import SubMenu from 'antd/lib/menu/SubMenu';
 
 const { Header, Sider, Content } = Layout;
 
@@ -33,19 +34,37 @@ const AppLayout = (props) => {
       >
         <div className="logo">
           <Link href={`/dashboard/${role}`}>
-            <span style={{ color: '#fff', cursor: 'pointer' }}>{role}</span>
+            <span style={{ color: '#fff', cursor: 'pointer' }}>CMS</span>
           </Link>
         </div>
         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
           <Menu.Item key="1" icon={<ReadOutlined />} className="icon">
             <Link href={`/dashboard/${role}`}>Home</Link>
-          </Menu.Item>{' '}
-          <Menu.Item key="2" icon={<ReadOutlined />} className="icon">
-            <Link href={`/dashboard/${role}/studentList`}>Student List</Link>
           </Menu.Item>
+          <SubMenu key="student" icon={<ReadOutlined />} title="Student">
+            <Menu.Item key="2" icon={<ReadOutlined />} className="icon">
+              <Link href={`/dashboard/${role}/student`}>Student List</Link>
+            </Menu.Item>
+          </SubMenu>
+
+          {role == 'manager' && (
+            <SubMenu key="course" icon={<ReadOutlined />} title="Course">
+              <Menu.Item key="4" icon={<ReadOutlined />} className="icon">
+                <Link href={`/dashboard/${role}/course`}>All Courses</Link>
+              </Menu.Item>
+              <Menu.Item key="5" icon={<ReadOutlined />} className="icon">
+                <Link href={`/dashboard/${role}/course/add-course`}>Add Courses</Link>
+              </Menu.Item>
+              <Menu.Item key="6" icon={<ReadOutlined />} className="icon">
+                <Link href={`/dashboard/${role}/course/edit-course`}>
+                  Edit Courses
+                </Link>
+              </Menu.Item>
+            </SubMenu>
+          )}
         </Menu>
       </Sider>
-      <Layout>
+      <Layout id="contentLayout">
         <Header className="styledHeader">
           <span className="icon" onClick={() => toggleCollapsed(!collapsed)}>
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -104,7 +123,7 @@ const AppLayout = (props) => {
           </Row>
         </Header>
 
-        <AppBreadCrumb></AppBreadCrumb>
+        {/* <AppBreadCrumb></AppBreadCrumb> */}
         <Content className="content-style">{children}</Content>
       </Layout>
     </Layout>

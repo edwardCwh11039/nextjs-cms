@@ -1,14 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Space, Input, Button, Modal, Popconfirm } from 'antd';
+import {
+  Table,
+  Space,
+  Input,
+  Button,
+  Modal,
+  Popconfirm,
+  Breadcrumb,
+} from 'antd';
 import TextLink from 'antd/lib/typography/Link';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
 import { debounce } from 'lodash';
-import AppLayout from '../../../components/layout/layout';
-import ModalForm from '../../../components/modalForm';
-import { student_types } from '../../../lib/constant/config';
-import apiServices from '../../../lib/services/api-services';
-import storage from '../../../lib/services/storage';
+import AppLayout from '../../../../components/layout/layout';
+import ModalForm from '../../../../components/modalForm';
+import { student_types } from '../../../../lib/constant/config';
+import apiServices from '../../../../lib/services/api-services';
+import storage from '../../../../lib/services/storage';
 
 const { Search } = Input;
 
@@ -68,7 +76,9 @@ const studentList = ({ countries }) => {
         return pre > next ? 1 : pre === next ? 0 : -1;
       },
       render: (_, record) => (
-        <Link href={`/dashboard/${storage.getRole()}/${record.id}`}>{record.name}</Link>
+        <Link href={`/dashboard/${storage.getRole()}/student/${record.id}`}>
+          {record.name}
+        </Link>
       ),
     },
     {
@@ -153,7 +163,20 @@ const studentList = ({ countries }) => {
 
   return (
     <AppLayout>
-      <Space>
+      <Breadcrumb style={{ marginBottom: '20px' }}>
+        <Breadcrumb.Item>CMS System</Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <a href="">Student List</a>
+        </Breadcrumb.Item>
+      </Breadcrumb>
+
+      <Space
+        style={{
+          marginBottom: '20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
         <Button
           type="primary"
           onClick={() => {

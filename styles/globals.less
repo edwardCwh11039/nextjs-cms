@@ -64,5 +64,43 @@
   background-color: #fff;
   padding: 16px;
   min-height: auto;
-  overflow: auto;
+}
+
+.courseRow {
+  position: relative;
+  ::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    background: #f0f0f0;
+    width: 100%;
+    height: 1px;
+  }
+}
+#contentLayout {
+  overflow-x: hidden;
+}
+.courseDetailCol {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid #f0f0f0;
+  border-left: none;
+  border-bottom: none;
+  :last-child {
+    border-right: none;
+  }
+  p {
+    margin-bottom: 0;
+  }
+  b {
+    color: #7356f1;
+    font-size: 24px;
+  }
+}
+.courseDetailRow {
+  width: calc(100% + 48px);
+  margin: 0 0 0 -24px !important;
 }
