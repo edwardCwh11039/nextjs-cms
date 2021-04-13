@@ -24,57 +24,30 @@ export async function getServerSideProps(context) {
   return { props: { id } };
 }
 
-export function WeekCalendar({ data }) {
-  if (!data) {
-    return <></>;
-  }
-  const columns = weekDays.map((day) => {
-    const target =
-      data.find((item) =>
-        item.toLocaleLowerCase().includes(day.toLocaleLowerCase())
-      ) || '';
-    const time = target.split(' ')[1];
-    return { title: day, key: day, align: 'center', render: () => time };
-  });
-  const dataSource = new Array(1).fill({ id: 0 });
+export const getChapterExtra = (source, index) => {
+  const activeIndex = source.chapters.findIndex(
+    (item) => item.id === source.current
+  );
+  const status = index === activeIndex ? 1 : index < activeIndex ? 0 : 2;
 
   return (
-    <Table
-      rowKey="id"
-      bordered
-      size="small"
-      pagination={false}
-      columns={columns}
-      dataSource={dataSource}
-      onRow={() => ({
-        onMouseEnter: (event) => {
-          const parent = event.target.parentNode;
-
-          Array.prototype.forEach.call(parent.childNodes, (item) => {
-            item.style.background = 'transparent';
-          });
-          parent.style.background = 'transparent';
-        },
-      })}
-    ></Table>
+    <Tag color={CourseStatusColor[status]}>{CourseStatusText[status]}</Tag>
   );
-}
+};
 
 export default function Page({ id }) {
   const [info, setInfo] = useState({});
   const [activeChapterIndex, setActiveChapterIndex] = useState(0);
   const [data, setData] = useState(null);
 
-  const getChapterExtra = (source, index) => {
-    const activeIndex = source.chapters.findIndex(
-      (item) => item.id === source.current
-    );
-    const status = index === activeIndex ? 1 : index < activeIndex ? 0 : 2;
-
-    return (
-      <Tag color={CourseStatusColor[status]}>{CourseStatusText[status]}</Tag>
-    );
-  };
+  const columns = weekDays.map((day) => {
+    const target =
+      data?.schedule.classTime.find((time) =>
+        time.toLocaleLowerCase().includes(day.toLocaleLowerCase())
+      ) || '';
+    const time = target.split(' ')[1];
+    return { title: day, key: day, render: () => time };
+  });
 
   useEffect(() => {
     apiServices.getCoursesById(id).then((res) => {
@@ -122,7 +95,7 @@ export default function Page({ id }) {
             <h2 style={{ color: '#7356f1' }}>Course Detail</h2>
 
             <h3 style={{ margin: '1em 0' }}>Create Time</h3>
-            <Row>{data?.ctime}</Row>
+            <Row>{data?.createdAt}</Row>
 
             <h3 style={{ margin: '1em 0' }}>Start Time</h3>
             <Row>{data?.startTime}</Row>
@@ -146,7 +119,18 @@ export default function Page({ id }) {
             <Row>{data?.uid}</Row>
 
             <h3 style={{ margin: '1em 0' }}>Class Time</h3>
-            <WeekCalendar data={data?.schedule.classTime} />
+            {!data?.schedule.classTime ? (
+              <></>
+            ) : (
+              <Table
+                rowKey="id"
+                bordered
+                size="small"
+                pagination={false}
+                columns={columns}
+                dataSource={data?.schedule.classTime}
+              ></Table>
+            )}
 
             <h3 style={{ margin: '1em 0' }}>Category</h3>
             <Row>
@@ -158,16 +142,7 @@ export default function Page({ id }) {
             </Row>
 
             <h3 style={{ margin: '1em 0' }}>Description</h3>
-            {data?.detail !== 'no' ? (
-              <Row>{data?.detail}</Row>
-            ) : (
-              <Row>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Nostrum, iure soluta. Perspiciatis, odit perferendis suscipit
-                alias aut voluptatem aliquam dolorem rerum animi tempore nostrum
-                cum non temporibus rem cupiditate optio.
-              </Row>
-            )}
+            {data?.detail !== 'no' ? <Row>{data?.detail}</Row> : <Row></Row>}
 
             <h3 style={{ margin: '1em 0' }}>Chapter</h3>
             {data?.schedule && (

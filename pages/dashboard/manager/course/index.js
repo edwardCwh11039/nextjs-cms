@@ -1,7 +1,7 @@
 import { Button, List, BackTop, Spin } from 'antd';
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
-import InfiniteScroll from 'react-infinite-scroller';
+import React, { useState, useEffect, useRef } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import AppLayout from '../../../../components/layout/layout';
 import apiServices from '../../../../lib/services/api-services';
 import storage from '../../../../lib/services/storage';
@@ -9,46 +9,66 @@ import CourseOverview from '../../../../components/course/overview';
 
 export default function Page() {
   const [data, setData] = useState([]);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const scrollParentRef = useRef(null);
 
   useEffect(() => {
     apiServices.getCourses(page).then((res) => {
+      const { courses, total } = res.data;
+      setTotal(total);
+      setData(courses);
+      console.log(res.data);
+    });
+  }, []);
+
+  const fetchData = (page) => {
+    console.log(data);
+    console.log(page);
+    setPage(page);
+    apiServices.getCourses(page).then((res) => {
       const { courses } = res.data;
-      if (courses.length < 20) {
-        setHasMore(false);
-      }
+      console.log(data);
       const course = data.concat(courses);
       setData(course);
-      setLoading(false);
+      console.log(res.data);
     });
-  }, [page]);
+  };
 
   return (
     <AppLayout>
+      <div ref={scrollParentRef}>
         <InfiniteScroll
-          initialLoad={false}
-          pageStart={0}
-          loadMore={() => {
-            console.log('loadmore-----', page);
-            setLoading(true);
-            setPage(++page);
+          dataLength={total}
+          next={() => {
+            fetchData(page + 1);
           }}
-          hasMore={!loading && hasMore}
+          hasMore={hasMore}
           loader={
             <div
               style={{
                 position: 'relative',
                 left: '50%',
                 marginTop: '10px',
-                transfrom: 'translateX(50%)',
               }}
             >
               <Spin size="large" />
             </div>
           }
-          useWindow={false}
+          endMessage={
+            <div
+              style={{
+                position: 'relative',
+                left: '50%',
+                marginTop: '10px',
+              }}
+            >
+              No more Course!
+            </div>
+          }
+          scrollableTarget="contentLayout"
+          style={{ overflow: 'hidden' }}
         >
           <List
             rowKey="courseList"
@@ -78,6 +98,7 @@ export default function Page() {
           ></List>
         </InfiniteScroll>
         <BackTop target={() => document.getElementById('contentLayout')} />
+      </div>
     </AppLayout>
   );
 }
