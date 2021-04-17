@@ -3,12 +3,11 @@ import { Card, Col, Row } from 'antd';
 import Link from 'next/link';
 import React from 'react';
 import { useEffect } from 'react';
-
-const DurationUnit = ['year', 'month', 'day', 'week', 'hour'];
+import { duration_unit } from '../../lib/constant/durationUnit';
 
 const getDuration = (data) => {
   const { duration, durationUnit } = data;
-  const text = `${duration} ${DurationUnit[durationUnit]}`;
+  const text = `${duration} ${duration_unit[durationUnit]}`;
 
   return duration > 1 ? text + 's' : text;
 };
@@ -60,7 +59,7 @@ export default function CourseOverview(props) {
           <b>{props.maxStudents}</b>
         </Col>
       </Row>
-      
+
       {props.children}
     </Card>
   );

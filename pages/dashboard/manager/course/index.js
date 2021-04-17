@@ -9,7 +9,6 @@ import CourseOverview from '../../../../components/course/overview';
 
 export default function Page() {
   const [data, setData] = useState([]);
-  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const scrollParentRef = useRef(null);
@@ -17,32 +16,20 @@ export default function Page() {
   useEffect(() => {
     apiServices.getCourses(page).then((res) => {
       const { courses, total } = res.data;
-      setTotal(total);
-      setData(courses);
-      console.log(res.data);
-    });
-  }, []);
+      const newData = data.concat(courses);
 
-  const fetchData = (page) => {
-    console.log(data);
-    console.log(page);
-    setPage(page);
-    apiServices.getCourses(page).then((res) => {
-      const { courses } = res.data;
-      console.log(data);
-      const course = data.concat(courses);
-      setData(course);
-      console.log(res.data);
+      setData(newData);
+      setHasMore(newData.length < total);
     });
-  };
+  }, [page]);
 
   return (
     <AppLayout>
       <div ref={scrollParentRef}>
         <InfiniteScroll
-          dataLength={total}
+          dataLength={data.length}
           next={() => {
-            fetchData(page + 1);
+            setPage(page + 1);
           }}
           hasMore={hasMore}
           loader={

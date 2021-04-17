@@ -23,7 +23,11 @@ const AppLayout = (props) => {
   const { children } = props;
   const [collapsed, toggleCollapsed] = useState(false);
   const router = useRouter();
-  const role = storage.getRole();
+  const role = storage.getRole() || router.pathname.split('/')[2];
+  const paths = router.pathname.split('/');
+  const defaultSelectedKeys =
+    paths.length === 3 ? 'overview' : paths[paths.length - 1];
+  const defaultOpenKeys = paths[3] || '';
 
   return (
     <Layout style={{ height: '100vh' }}>
@@ -37,25 +41,40 @@ const AppLayout = (props) => {
             <span style={{ color: '#fff', cursor: 'pointer' }}>CMS</span>
           </Link>
         </div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-          <Menu.Item key="1" icon={<ReadOutlined />} className="icon">
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={defaultSelectedKeys}
+          defaultOpenKeys={[defaultOpenKeys]}
+        >
+          <Menu.Item key="overview" icon={<ReadOutlined />} className="icon">
             <Link href={`/dashboard/${role}`}>Home</Link>
           </Menu.Item>
           <SubMenu key="student" icon={<ReadOutlined />} title="Student">
-            <Menu.Item key="2" icon={<ReadOutlined />} className="icon">
+            <Menu.Item key="student" icon={<ReadOutlined />} className="icon">
               <Link href={`/dashboard/${role}/student`}>Student List</Link>
             </Menu.Item>
           </SubMenu>
 
-          {role == 'manager' && (
+          {role === 'manager' && (
             <SubMenu key="course" icon={<ReadOutlined />} title="Course">
-              <Menu.Item key="4" icon={<ReadOutlined />} className="icon">
+              <Menu.Item key="course" icon={<ReadOutlined />} className="icon">
                 <Link href={`/dashboard/${role}/course`}>All Courses</Link>
               </Menu.Item>
-              <Menu.Item key="5" icon={<ReadOutlined />} className="icon">
-                <Link href={`/dashboard/${role}/course/add-course`}>Add Courses</Link>
+              <Menu.Item
+                key="add-course"
+                icon={<ReadOutlined />}
+                className="icon"
+              >
+                <Link href={`/dashboard/${role}/course/add-course`}>
+                  Add Courses
+                </Link>
               </Menu.Item>
-              <Menu.Item key="6" icon={<ReadOutlined />} className="icon">
+              <Menu.Item
+                key="edit-course"
+                icon={<ReadOutlined />}
+                className="icon"
+              >
                 <Link href={`/dashboard/${role}/course/edit-course`}>
                   Edit Courses
                 </Link>

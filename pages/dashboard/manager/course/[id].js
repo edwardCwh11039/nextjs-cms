@@ -39,15 +39,7 @@ export default function Page({ id }) {
   const [info, setInfo] = useState({});
   const [activeChapterIndex, setActiveChapterIndex] = useState(0);
   const [data, setData] = useState(null);
-
-  const columns = weekDays.map((day) => {
-    const target =
-      data?.schedule.classTime.find((time) =>
-        time.toLocaleLowerCase().includes(day.toLocaleLowerCase())
-      ) || '';
-    const time = target.split(' ')[1];
-    return { title: day, key: day, render: () => time };
-  });
+  const [columns, setColumns] = useState([]);
 
   useEffect(() => {
     apiServices.getCoursesById(id).then((res) => {
@@ -59,6 +51,16 @@ export default function Page({ id }) {
         Students: sales.studentAmount,
         Earings: sales.earnings,
       };
+      const columns = weekDays.map((day) => {
+        const target =
+          data.schedule.classTime?.find((time) =>
+            time.toLocaleLowerCase().includes(day.toLocaleLowerCase())
+          ) || '';
+        const time = target.split(' ')[1];
+
+        return { title: day, key: day, render: () => time };
+      });
+
       setInfo(info);
       setActiveChapterIndex(
         data.schedule.chapters.findIndex(
@@ -66,6 +68,7 @@ export default function Page({ id }) {
         )
       );
       setData(data);
+      setColumns(columns);
     });
   }, []);
 
@@ -80,12 +83,14 @@ export default function Page({ id }) {
               justify="space-between"
               align="middle"
             >
-              {Object.entries(info).forEach(([key, value]) => (
-                <Col className="courseDetailCol" span="6" key={value}>
-                  <b>{value}</b>
-                  <p>{key}</p>
-                </Col>
-              ))}
+              {Object.keys(info).map((key) => {
+                return (
+                  <Col className="courseDetailCol" span="6" key={key}>
+                    <b>{info[key]}</b>
+                    <p>{key}</p>
+                  </Col>
+                );
+              })}
             </Row>
           </CourseOverview>
         </Col>

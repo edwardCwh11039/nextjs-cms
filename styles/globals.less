@@ -112,3 +112,51 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+.descriptionTextArea {
+  .ant-form-item-control {
+    position: absolute;
+    inset: 0;
+    top: 37px;
+    bottom: 30px;
+  }
+  .ant-form-item-control-input,
+  .ant-form-item-control-input-content,
+  text-area {
+    height: 100%;
+  }
+}
+.uploadArea {
+  .ant-upload.ant-upload-select-picture-card {
+    width: 100%;
+    margin: 0;
+  }
+  .ant-form-item-control {
+    position: absolute;
+    inset: 0;
+    top: 37px;
+    bottom: 30px;
+  }
+  .ant-upload-picture-card-wrapper,
+  .ant-form-item-control-input,
+  .ant-form-item-control-input div {
+    height: 100%;
+  }
+  .ant-upload-picture-card-wrapper img {
+    object-fit: cover !important;
+  }
+  .ant-upload-list-item-progress,
+  .ant-tooltip {
+    height: auto !important;
+    .ant-tooltip-arrow {
+      height: 13px;
+    }
+  }
+  .ant-upload-list-picture-card-container {
+    width: 100%;
+  }
+  .ant-upload-list-item-actions {
+    .anticon-delete {
+      color: red;
+    }
+  }
+}
