@@ -36,7 +36,7 @@ export default function AddCourse({ onFinish }) {
   const [courseTypes, setCourseTypes] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [fileList, setFileList] = useState([]);
-  const [preview, setPreview] = useState({});
+  const [preview, setPreview] = useState(null);
 
   const handdleFinnish = (values) => {
     const data = {
@@ -46,7 +46,8 @@ export default function AddCourse({ onFinish }) {
       teacherId: +values.teacherId,
       durationUnit: +values.duration.unit,
     };
-    apiServices.addCourse(data).then((res) => onFinish(res.data));
+    console.log('%c [ data ]', 'font-size:13px; background:pink; color:#bf2c9f;', data)
+    //apiServices.addCourse(data).then((res) => onFinish(res.data));
   };
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export default function AddCourse({ onFinish }) {
     <>
       <Form form={form} layout="vertical" onFinish={handdleFinnish}>
         <Row gutter={[6, 16]}>
-          <Col span={6}>
+          <Col span={8}>
             <Form.Item
               label="Course Name"
               name="name"
@@ -76,57 +77,65 @@ export default function AddCourse({ onFinish }) {
               <Input type="text" placeholder="course name" />
             </Form.Item>
           </Col>{' '}
-          <Col span={6}>
-            <Form.Item
-              label="Teacher"
-              name="teacherId"
-              rules={[{ required: true }]}
-            >
-              <Select
-                placeholder="Select teacher"
-                showSearch
-                filterOption={false}
-                onSearch={(value) => {
-                  apiServices.getTeachers(value).then((res) => {
-                    const { teachers } = res.data;
+          <Col span={16}>
+            <Row gutter={[6, 16]}>
+              <Col span={8}>
+                <Form.Item
+                  label="Teacher"
+                  name="teacherId"
+                  rules={[{ required: true }]}
+                >
+                  <Select
+                    placeholder="Select teacher"
+                    showSearch
+                    filterOption={false}
+                    onSearch={(value) => {
+                      apiServices.getTeachers(value).then((res) => {
+                        const { teachers } = res.data;
 
-                    if (teachers.length > 0) {
-                      setTeachers(teachers);
-                    }
-                  });
-                }}
-              >
-                {teachers.map(({ id, name }) => {
-                  return (
-                    <Select.Option key={id} value={id}>
-                      {name}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>{' '}
-          <Col span={6}>
-            <Form.Item label="Type" name="type" rules={[{ required: true }]}>
-              <Select mode="multiple">
-                {courseTypes.map((value) => {
-                  return (
-                    <Select.Option key={value.id} value={value.id}>
-                      {value.name}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item
-              label="Course Code"
-              name="uid"
-              rules={[{ required: true }]}
-            >
-              <Input type="text" placeholder="course code" disabled />
-            </Form.Item>
+                        if (teachers.length > 0) {
+                          setTeachers(teachers);
+                        }
+                      });
+                    }}
+                  >
+                    {teachers.map(({ id, name }) => {
+                      return (
+                        <Select.Option key={id} value={id}>
+                          {name}
+                        </Select.Option>
+                      );
+                    })}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  label="Type"
+                  name="type"
+                  rules={[{ required: true }]}
+                >
+                  <Select mode="multiple">
+                    {courseTypes.map((value) => {
+                      return (
+                        <Select.Option key={value.id} value={value.id}>
+                          {value.name}
+                        </Select.Option>
+                      );
+                    })}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item
+                  label="Course Code"
+                  name="uid"
+                  rules={[{ required: true }]}
+                >
+                  <Input type="text" placeholder="course code" disabled />
+                </Form.Item>
+              </Col>
+            </Row>
           </Col>
         </Row>
 
@@ -145,7 +154,14 @@ export default function AddCourse({ onFinish }) {
             </Form.Item>
 
             <Form.Item label="Price" name="price">
-              <InputNumber min={0} style={{ width: '100%' }}></InputNumber>
+              <InputNumber
+                formatter={(value) =>
+                  `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                }
+                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                min={0}
+                style={{ width: '100%' }}
+              ></InputNumber>
             </Form.Item>
 
             <Form.Item label="Student Limit" name="maxStudents">
@@ -153,7 +169,10 @@ export default function AddCourse({ onFinish }) {
             </Form.Item>
 
             <Form.Item label="Duration" name="duration">
-              <NumberWithUnit options={duration_unit} defaultUnit={2} />
+              <NumberWithUnit
+                options={duration_unit}
+                defaultUnit={2}
+              />
             </Form.Item>
           </Col>
 

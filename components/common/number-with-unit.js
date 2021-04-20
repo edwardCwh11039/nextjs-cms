@@ -2,8 +2,8 @@ import { Input, InputNumber, Select } from 'antd';
 import React, { useState } from 'react';
 
 const NumberWithUnit = ({ value = {}, onChange, options, defaultUnit }) => {
-  const [number, setNumber] = useState(0);
-  const [unit, setUnit] = useState(defaultUnit);
+  const [number, setNumber] = useState(value.number);
+  const [unit, setUnit] = useState(value.unit || defaultUnit);
   const triggerChange = (changedValue) => {
     if (onChange) {
       onChange({ number, unit, ...value, ...changedValue });
@@ -35,6 +35,7 @@ const NumberWithUnit = ({ value = {}, onChange, options, defaultUnit }) => {
         onChange={onNumberChange}
         style={{ flex: 1 }}
       />
+
       <Select value={value.unit || unit} onChange={onUnitChange}>
         {Object.keys(options).map((key) => (
           <Select.Option value={key} key={key}>
