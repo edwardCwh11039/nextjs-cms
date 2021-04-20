@@ -7,7 +7,23 @@ const { Step } = Steps;
 
 export default function Page() {
   const [step, setStep] = useState(0);
-  const steps = [<AddCourse></AddCourse>, <p>hi2</p>];
+  const [availableStep, setAvailableStep] = useState([0]);
+  const [courseId, setCourseId] = useState(null);
+  const [scheduleId, setScheduleId] = useState(null);
+  const nextStep = () => {
+    setStep(step + 1);
+    setAvailableStep([...availableStep, step + 1]);
+  };
+  const steps = [
+    <AddCourse
+      onFinish={(course) => {
+        setCourseId(course.id);
+        setScheduleId(course.scheduleId);
+        nextStep();
+      }}
+    ></AddCourse>,
+    <p>hi2</p>,
+  ];
 
   return (
     <AppLayout>
@@ -15,7 +31,9 @@ export default function Page() {
         current={step}
         type="navigation"
         onChange={(current) => {
-          setStep(current);
+          if (availableStep.includes(current)) {
+            setStep(current);
+          }
         }}
         style={{ padding: '1em 1.6%', margin: '20px 0' }}
       >
