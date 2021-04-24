@@ -38,7 +38,7 @@ export default function AddCourse({ onFinish }) {
   const [fileList, setFileList] = useState([]);
   const [preview, setPreview] = useState(null);
 
-  const handdleFinnish = (values) => {
+  const handleFinish = (values) => {
     const data = {
       ...values,
       duration: values.duration.number,
@@ -46,8 +46,7 @@ export default function AddCourse({ onFinish }) {
       teacherId: +values.teacherId,
       durationUnit: +values.duration.unit,
     };
-    console.log('%c [ data ]', 'font-size:13px; background:pink; color:#bf2c9f;', data)
-    //apiServices.addCourse(data).then((res) => onFinish(res.data));
+    apiServices.addCourse(data).then((res) => onFinish(res.data));
   };
 
   useEffect(() => {
@@ -66,7 +65,7 @@ export default function AddCourse({ onFinish }) {
 
   return (
     <>
-      <Form form={form} layout="vertical" onFinish={handdleFinnish}>
+      <Form form={form} layout="vertical" onFinish={handleFinish}>
         <Row gutter={[6, 16]}>
           <Col span={8}>
             <Form.Item

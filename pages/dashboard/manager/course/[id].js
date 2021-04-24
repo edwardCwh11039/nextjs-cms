@@ -4,16 +4,8 @@ import React, { useEffect, useState } from 'react';
 import AppLayout from '../../../../components/layout/layout';
 import apiServices from '../../../../lib/services/api-services';
 import CourseOverview from '../../../../components/course/overview';
+import { weekDays } from '../../../../lib/constant/config';
 
-const weekDays = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-];
 const CourseStatusText = ['finised', 'processing', 'pending'];
 const CourseStatusBadge = ['warning', 'seccess', 'default'];
 const CourseStatusColor = ['default', 'green', 'orange'];

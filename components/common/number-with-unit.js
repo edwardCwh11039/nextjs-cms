@@ -38,8 +38,8 @@ const NumberWithUnit = ({ value = {}, onChange, options, defaultUnit }) => {
 
       <Select value={value.unit || unit} onChange={onUnitChange}>
         {Object.keys(options).map((key) => (
-          <Select.Option value={key} key={key}>
-            {options[key]}
+          <Select.Option value={+key} key={key}>
+            {options[+key]}
           </Select.Option>
         ))}
       </Select>

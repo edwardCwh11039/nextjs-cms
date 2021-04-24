@@ -1,7 +1,10 @@
-import { Steps } from 'antd';
+import { Steps, Result, Button } from 'antd';
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import AppLayout from '../../../../components/layout/layout';
 import AddCourse from '../../../../components/course/add-course';
+import CourseChapterForm from '../../../../components/course/course-chapter';
+import storage from '../../../../lib/services/storage';
 
 const { Step } = Steps;
 
@@ -10,6 +13,7 @@ export default function Page() {
   const [availableStep, setAvailableStep] = useState([0]);
   const [courseId, setCourseId] = useState(null);
   const [scheduleId, setScheduleId] = useState(null);
+  const router = useRouter();
   const nextStep = () => {
     setStep(step + 1);
     setAvailableStep([...availableStep, step + 1]);
@@ -22,7 +26,34 @@ export default function Page() {
         nextStep();
       }}
     ></AddCourse>,
-    <p>hi2</p>,
+    <CourseChapterForm
+      courseId={courseId}
+      scheduleId={scheduleId}
+      onFinish={nextStep}
+    ></CourseChapterForm>,
+    <Result
+      status="success"
+      title="Successfully Create Course!"
+      extra={[
+        <Button
+          type="primary"
+          key="detail"
+          onClick={() =>
+            router.push(`/dashboard/${storage.getRole()}/course/${courseId}`)
+          }
+        >
+          Go Course
+        </Button>,
+        <Button
+          key="again"
+          onClick={() => {
+            router.reload();
+          }}
+        >
+          Create Again
+        </Button>,
+      ]}
+    />,
   ];
 
   return (
