@@ -139,8 +139,19 @@ export default function AddCourse({ onFinish }) {
         </Row>
 
         <Row gutter={[6, 16]}>
-          <Col span={8}>
-            <Form.Item label="Start Date" name="startTime">
+          <Col
+            span={8}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignContent: 'space-between',
+            }}
+          >
+            <Form.Item
+              label="Start Date"
+              name="startTime"
+              style={{ marginBottom: '0' }}
+            >
               <DatePicker
                 style={{ width: '100%' }}
                 disabledDate={(current) => {
@@ -152,7 +163,7 @@ export default function AddCourse({ onFinish }) {
               />
             </Form.Item>
 
-            <Form.Item label="Price" name="price">
+            <Form.Item label="Price" name="price" style={{ marginBottom: '0' }}>
               <InputNumber
                 formatter={(value) =>
                   `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -163,15 +174,20 @@ export default function AddCourse({ onFinish }) {
               ></InputNumber>
             </Form.Item>
 
-            <Form.Item label="Student Limit" name="maxStudents">
+            <Form.Item
+              label="Student Limit"
+              name="maxStudents"
+              style={{ marginBottom: '0' }}
+            >
               <InputNumber min={0} style={{ width: '100%' }}></InputNumber>
             </Form.Item>
 
-            <Form.Item label="Duration" name="duration">
-              <NumberWithUnit
-                options={duration_unit}
-                defaultUnit={2}
-              />
+            <Form.Item
+              label="Duration"
+              name="duration"
+              style={{ marginBottom: '0' }}
+            >
+              <NumberWithUnit options={duration_unit} defaultUnit={2} />
             </Form.Item>
           </Col>
 
@@ -226,9 +242,17 @@ export default function AddCourse({ onFinish }) {
                   }}
                 >
                   {fileList.length >= 1 ? null : (
-                    <div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                      }}
+                    >
                       <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
+                        <InboxOutlined
+                          style={{ fontSize: '48px', color: '#1890ff' }}
+                        />
                       </p>
                       <p className="ant-upload-text">
                         Click or drag file to this area to upload

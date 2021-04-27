@@ -46,26 +46,6 @@ export default function CourseChapterForm({ courseId, scheduleId, onFinish }) {
     });
   };
 
-  useEffect(() => {
-    if (scheduleId != null) {
-      return;
-    }
-
-    apiServices.getScheduleById(scheduleId).then((res) => {
-      const { data } = res;
-      if (!!data) {
-        const classTimes = data.classTime.map((item) => {
-          const [weekday, time] = item.split(' ');
-
-          return { weekday, time: new Date(`2020-11-11 ${time}`) };
-        });
-
-        form.setFieldsValue({ chapters: data.chapters, classTime: classTimes });
-        setSelectedDays(classTimes.map((item) => item.weekday));
-      }
-    });
-  }, [scheduleId]);
-
   return (
     <Form
       name="schedule"

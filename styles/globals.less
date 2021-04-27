@@ -68,14 +68,14 @@
 
 .courseRow {
   position: relative;
-  ::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    background: #f0f0f0;
-    width: 100%;
-    height: 1px;
-  }
+}
+.courseRow:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  background: #f0f0f0;
+  width: 100%;
+  height: 1px;
 }
 #contentLayout {
   overflow-x: hidden;
@@ -113,28 +113,17 @@
   -ms-overflow-style: none;
 }
 .descriptionTextArea {
-  .ant-form-item-control {
-    position: absolute;
-    inset: 0;
-    top: 37px;
-    bottom: 30px;
-  }
   .ant-form-item-control-input,
   .ant-form-item-control-input-content,
   text-area {
     height: 100%;
   }
+  height: 100%;
 }
 .uploadArea {
   .ant-upload.ant-upload-select-picture-card {
     width: 100%;
     margin: 0;
-  }
-  .ant-form-item-control {
-    position: absolute;
-    inset: 0;
-    top: 37px;
-    bottom: 30px;
   }
   .ant-upload-picture-card-wrapper,
   .ant-form-item-control-input,
@@ -159,4 +148,5 @@
       color: red;
     }
   }
+  height: 100%;
 }
