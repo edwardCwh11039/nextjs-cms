@@ -9,6 +9,7 @@ import {
   Upload,
   Button,
   message,
+  Spin,
 } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'antd/lib/form/Form';
@@ -39,6 +40,7 @@ export default function CourseDetailForm({ course, onFinish }) {
   const [fileList, setFileList] = useState([]);
   const [preview, setPreview] = useState(null);
   const [isAdd, setIsAdd] = useState(course === undefined);
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleFinish = (values) => {
     if (!isAdd && !course) {
@@ -117,25 +119,26 @@ export default function CourseDetailForm({ course, onFinish }) {
                 >
                   <Select
                     placeholder="Select teacher"
+                    notFoundContent={isSearching ? <Spin size="small" /> : null}
                     showSearch
                     filterOption={false}
                     onSearch={(value) => {
+                      setIsSearching(true);
                       apiServices.getTeachers(value).then((res) => {
                         const { teachers } = res.data;
 
                         if (teachers.length > 0) {
                           setTeachers(teachers);
                         }
+                        setIsSearching(false);
                       });
                     }}
                   >
-                    {teachers.map(({ id, name }) => {
-                      return (
-                        <Select.Option key={id} value={id}>
-                          {name}
-                        </Select.Option>
-                      );
-                    })}
+                    {teachers.map(({ id, name }) => (
+                      <Select.Option key={id} value={id}>
+                        {name}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>
@@ -146,13 +149,11 @@ export default function CourseDetailForm({ course, onFinish }) {
                   rules={[{ required: true }]}
                 >
                   <Select mode="multiple">
-                    {courseTypes.map((value) => {
-                      return (
-                        <Select.Option key={value.id} value={value.id}>
-                          {value.name}
-                        </Select.Option>
-                      );
-                    })}
+                    {courseTypes.map((value) => (
+                      <Select.Option key={value.id} value={value.id}>
+                        {value.name}
+                      </Select.Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>

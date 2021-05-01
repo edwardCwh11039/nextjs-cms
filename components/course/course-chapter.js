@@ -1,7 +1,6 @@
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { Input, message, Row, Col, TimePicker, Button, Select } from 'antd';
 import Form, { useForm } from 'antd/lib/form/Form';
-import { Option } from 'antd/lib/mentions';
 import React, { useState, useEffect } from 'react';
 import { weekDays } from '../../lib/constant/config';
 import apiServices from '../../lib/services/api-services';
@@ -61,7 +60,6 @@ export default function CourseChapterForm({
       const { data } = res;
 
       const classTimes = data.classTime.map((item) => {
-        console.log(item);
         const [weekday, time] = item.split(' ');
 
         return { weekday, time: moment(`2020-11-11 ${time}`) };
@@ -169,13 +167,13 @@ export default function CourseChapterForm({
                           }
                         >
                           {weekDays.map((day) => (
-                            <Option
+                            <Select.Option
                               key={day}
                               value={day}
                               disabled={selectedDays.includes(day)}
                             >
                               {day}
-                            </Option>
+                            </Select.Option>
                           ))}
                         </Select>
                       </Form.Item>

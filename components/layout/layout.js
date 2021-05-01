@@ -142,7 +142,7 @@ const AppLayout = (props) => {
           </Row>
         </Header>
 
-        {/* <AppBreadCrumb></AppBreadCrumb> */}
+        <AppBreadCrumb />
         <Content className="content-style">{children}</Content>
       </Layout>
     </Layout>
