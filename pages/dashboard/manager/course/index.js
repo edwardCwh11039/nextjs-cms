@@ -14,7 +14,7 @@ export default function Page() {
   const scrollParentRef = useRef(null);
 
   useEffect(() => {
-    apiServices.getCourses(page).then((res) => {
+    apiServices.getScheduleByPage(page).then((res) => {
       const { courses, total } = res.data;
       const newData = data.concat(courses);
 

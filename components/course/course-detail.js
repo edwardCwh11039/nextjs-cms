@@ -8,12 +8,13 @@ import {
   InputNumber,
   Upload,
   Button,
+  message,
 } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'antd/lib/form/Form';
 import ImgCrop from 'antd-img-crop';
 import { getTime } from 'date-fns';
-import storage from '../../lib/services/storage';
+import moment from 'moment';
 import apiServices from '../../lib/services/api-services';
 import { duration_unit } from '../../lib/constant/durationUnit';
 import NumberWithUnit from '../common/number-with-unit';
@@ -30,23 +31,38 @@ function getBase64(file) {
   });
 }
 
-export default function AddCourse({ onFinish }) {
+export default function CourseDetailForm({ course, onFinish }) {
   const [form] = useForm();
   const [teachers, setTeachers] = useState([]);
   const [courseTypes, setCourseTypes] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [fileList, setFileList] = useState([]);
   const [preview, setPreview] = useState(null);
+  const [isAdd, setIsAdd] = useState(course === undefined);
 
   const handleFinish = (values) => {
-    const data = {
+    if (!isAdd && !course) {
+      message.error('You must select a course to update!');
+      return;
+    }
+    const req = {
       ...values,
       duration: values.duration.number,
       startTime: values.startTime.format('yyyy-MM-DD'),
-      teacherId: +values.teacherId,
+      teacherId: +values.teacherId || +course.teacherId,
       durationUnit: +values.duration.unit,
     };
-    apiServices.addCourse(data).then((res) => onFinish(res.data));
+    const res = isAdd
+      ? apiServices.addCourse(req)
+      : apiServices.updateCourses({ ...req, id: course.id });
+    const { data } = res;
+
+    if (!!data && !course) {
+      setIsAdd(false);
+    }
+    if (!!onFinish && !!data) {
+      onFinish(data);
+    }
   };
 
   useEffect(() => {
@@ -62,6 +78,21 @@ export default function AddCourse({ onFinish }) {
       setCourseTypes(data);
     });
   }, []);
+
+  useEffect(() => {
+    if (!!course) {
+      const values = {
+        ...course,
+        type: course.type.map((item) => item.id),
+        teacherId: course.teacherName,
+        startTime: moment(course.startTime),
+        duration: { number: course.duration, unit: course.durationUnit },
+      };
+
+      form.setFieldsValue(values);
+      setFileList([{ name: 'Cover Image', url: course.cover }]);
+    }
+  }, [course]);
 
   return (
     <>
@@ -147,11 +178,7 @@ export default function AddCourse({ onFinish }) {
               alignContent: 'space-between',
             }}
           >
-            <Form.Item
-              label="Start Date"
-              name="startTime"
-              style={{ marginBottom: '0' }}
-            >
+            <Form.Item label="Start Date" name="startTime">
               <DatePicker
                 style={{ width: '100%' }}
                 disabledDate={(current) => {
@@ -163,7 +190,7 @@ export default function AddCourse({ onFinish }) {
               />
             </Form.Item>
 
-            <Form.Item label="Price" name="price" style={{ marginBottom: '0' }}>
+            <Form.Item label="Price" name="price">
               <InputNumber
                 formatter={(value) =>
                   `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -174,11 +201,7 @@ export default function AddCourse({ onFinish }) {
               ></InputNumber>
             </Form.Item>
 
-            <Form.Item
-              label="Student Limit"
-              name="maxStudents"
-              style={{ marginBottom: '0' }}
-            >
+            <Form.Item label="Student Limit" name="maxStudents">
               <InputNumber min={0} style={{ width: '100%' }}></InputNumber>
             </Form.Item>
 
@@ -235,9 +258,9 @@ export default function AddCourse({ onFinish }) {
                     if (file?.response) {
                       form.setFieldsValue({ cover: file.response.url });
                     } else {
-                      form.setFieldsValue({ cover: '' });
+                      form.setFieldsValue({ cover: course?.cover || '' });
                     }
-                    setIsUploading(status === 'uploading');
+                    setIsUploading(file.status === 'uploading');
                     setFileList(fileList);
                   }}
                 >
@@ -268,6 +291,14 @@ export default function AddCourse({ onFinish }) {
                   setIsUploading(false);
                   setFileList([]);
                 }}
+                style={{
+                  color: 'red',
+                  position: 'absolute',
+                  right: '-10px',
+                  top: '1em',
+                  fontSize: '24px',
+                  opacity: '0.5',
+                }}
               />
             )}
           </Col>
@@ -277,7 +308,7 @@ export default function AddCourse({ onFinish }) {
           <Col span={8}>
             <Form.Item>
               <Button type="primary" htmlType="submit" disabled={isUploading}>
-                Create Course
+                {isAdd ? 'Create Course' : 'Update Course'}
               </Button>
             </Form.Item>
           </Col>

@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Table,
-  Space,
-  Input,
-  Button,
-  Modal,
-  Popconfirm,
-  Breadcrumb,
-} from 'antd';
+import { Table, Space, Input, Button, Modal, Popconfirm } from 'antd';
 import TextLink from 'antd/lib/typography/Link';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
@@ -163,13 +155,6 @@ const studentList = ({ countries }) => {
 
   return (
     <AppLayout>
-      <Breadcrumb style={{ marginBottom: '20px' }}>
-        <Breadcrumb.Item>CMS System</Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <a href="">Student List</a>
-        </Breadcrumb.Item>
-      </Breadcrumb>
-
       <Space
         style={{
           marginBottom: '20px',

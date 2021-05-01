@@ -5,8 +5,14 @@ import { Option } from 'antd/lib/mentions';
 import React, { useState, useEffect } from 'react';
 import { weekDays } from '../../lib/constant/config';
 import apiServices from '../../lib/services/api-services';
+import moment from 'moment';
 
-export default function CourseChapterForm({ courseId, scheduleId, onFinish }) {
+export default function CourseChapterForm({
+  courseId,
+  scheduleId,
+  onFinish,
+  isAdd = true,
+}) {
   const [form] = useForm();
   const [selectedDays, setSelectedDays] = useState([]);
   const initialValues = {
@@ -40,11 +46,31 @@ export default function CourseChapterForm({ courseId, scheduleId, onFinish }) {
     apiServices.updateSchedule(req).then((res) => {
       const { data } = res;
 
-      if (data) {
+      if (!!onFinish && data) {
         onFinish();
       }
     });
   };
+
+  useEffect(() => {
+    if (!scheduleId || isAdd) {
+      return;
+    }
+
+    apiServices.getScheduleById(scheduleId).then((res) => {
+      const { data } = res;
+
+      const classTimes = data.classTime.map((item) => {
+        console.log(item);
+        const [weekday, time] = item.split(' ');
+
+        return { weekday, time: moment(`2020-11-11 ${time}`) };
+      });
+
+      form.setFieldsValue({ chapters: data.chapters, classTime: classTimes });
+      setSelectedDays(classTimes.map((item) => item.weekday));
+    });
+  }, [scheduleId]);
 
   return (
     <Form

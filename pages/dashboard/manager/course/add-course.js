@@ -2,7 +2,7 @@ import { Steps, Result, Button } from 'antd';
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import AppLayout from '../../../../components/layout/layout';
-import AddCourse from '../../../../components/course/add-course';
+import CourseDetailForm from '../../../../components/course/course-detail';
 import CourseChapterForm from '../../../../components/course/course-chapter';
 import storage from '../../../../lib/services/storage';
 
@@ -19,13 +19,13 @@ export default function Page() {
     setAvailableStep([...availableStep, step + 1]);
   };
   const steps = [
-    <AddCourse
+    <CourseDetailForm
       onFinish={(course) => {
         setCourseId(course.id);
         setScheduleId(course.scheduleId);
         nextStep();
       }}
-    ></AddCourse>,
+    ></CourseDetailForm>,
     <CourseChapterForm
       courseId={courseId}
       scheduleId={scheduleId}
