@@ -8,6 +8,13 @@ import { useEffect, useState } from 'react';
 import StatisticsOverview from '../../../components/chart/overview';
 import AppLayout from '../../../components/layout/layout';
 import apiServices from '../../../lib/services/api-services';
+import DistributionChart from '../../../components/chart/distribution';
+import dynamic from 'next/dynamic';
+
+const Distribution = dynamic(
+  () => import('../../../components/chart/distribution'),
+  { ssr: false }
+);
 
 export default function Page() {
   const [overview, setOverview] = useState(null);
@@ -54,10 +61,9 @@ export default function Page() {
       )}
       <Row gutter={[6, 16]}>
         <Col span={12}>
-          <Card title="Distribution" extra={<a href="#">More</a>}></Card>
-        </Col>
-        <Col span={12}>
-          <Card title="Distribution" extra={<a href="#">More</a>}></Card>
+          <Card title="Distribution" extra={<a href="#">More</a>}>
+            <Distribution data={student} />
+          </Card>
         </Col>
       </Row>
     </AppLayout>
