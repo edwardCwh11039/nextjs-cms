@@ -11,10 +11,10 @@ const AppBreadCrumb = () => {
   const root = '/' + path.split('/').splice(1).slice(0, 2).join('/');
   const role = storage.getRole() || path.split('/')[2];
 
-  useEffect(() => {
-    console.log(paths);
-    console.log(root);
-  }, []);
+  // useEffect(() => {
+  //   console.log(paths);
+  //   console.log(root);
+  // }, []);
 
   return (
     <Breadcrumb style={{ margin: '0 16px', padding: 16 }}>

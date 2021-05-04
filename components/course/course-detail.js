@@ -87,7 +87,7 @@ export default function CourseDetailForm({ course, onFinish }) {
         ...course,
         type: course.type.map((item) => item.id),
         teacherId: course.teacherName,
-        startTime: moment(course.startTime),
+        startTime: course.startTime,
         duration: { number: course.duration, unit: course.durationUnit },
       };
 
