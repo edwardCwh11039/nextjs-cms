@@ -1,3 +1,4 @@
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { Form, Input, Button } from 'antd';
 import { useState } from 'react';
 
@@ -9,24 +10,24 @@ export default function EditableFormControl(props) {
       {isEditing ? (
         <Form
           name="basic"
-          initialValues={{ username: username }}
+          initialValues={props.initialValues}
           onFinish={(value) => {
             console.log(value.username);
             setUsername(value.username);
             setIsEditing(false);
           }}
         >
-          <Form.Item
-            label="Username"
-            name="username"
-            className="editable_form_control"
-          >
-            <Input />
-            <Button onClick={() => setIsEditing(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit">
-              Submit
+          <div className="editable_form_control">
+            <Form.Item label={props.label} name={props.name}>
+              {props.children}
+            </Form.Item>
+            <Button onClick={() => setIsEditing(false)}>
+              <CloseOutlined />
             </Button>
-          </Form.Item>
+            <Button type="primary" htmlType="submit">
+              <CheckOutlined />
+            </Button>
+          </div>
         </Form>
       ) : (
         <div onDoubleClick={() => setIsEditing(true)}>{username}</div>

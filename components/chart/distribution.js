@@ -3,55 +3,67 @@ import HighchartsReact from 'highcharts-react-official';
 import { useEffect, useState } from 'react';
 import apiServices from '../../lib/services/api-services';
 
-export default function DistributionChart({ data }) {
+export default function DistributionChart({ data, title }) {
   const [options, setOptions] = useState({
-    title: {
-      text: null,
+    colorAxis: {
+      min: 0,
+      stops: [
+        [0, '#fff'],
+        [0.5, Highcharts.getOptions().colors[0]],
+        [1, '#1890ff'],
+      ],
     },
-
-    mapNavigation: {
-      enabled: true,
-    },
-
     legend: {
       layout: 'vertical',
       align: 'left',
       verticalAlign: 'bottom',
     },
-    series: [
-      {
-        joinBy: ['hc-key', 'key'],
-        name: 'Random data',
-      },
-      {
-        type: 'mapline',
-        name: 'Separators',
-        nullColor: 'gray',
-        showInLegend: false,
-        enableMouseTracking: false,
-      },
-    ],
+    credits: {
+      enabled: false,
+    },
   });
+  const [mapGeo, setMapGeo] = useState(null);
 
   useEffect(() => {
     apiServices.getWorld().then((res) => {
-      console.log(res.data);
+      setMapGeo(res.data);
       setOptions({ series: [{ mapData: res.data }] });
     });
   }, []);
 
   useEffect(() => {
-    // console.log(data);
-    // setOptions({ series: [{ data: data }] });
-  }, [data]);
+    if (!data || !mapGeo) {
+      return;
+    }
+
+    const mapSource = data.map((country) => {
+      const target = mapGeo.features.find(
+        (feature) =>
+          country.name.toLowerCase() === feature.properties.name.toLowerCase()
+      );
+      return !!target
+        ? { 'hc-key': target.properties['hc-key'], value: country.amount }
+        : {};
+    });
+    setOptions({
+      title: {
+        text: `<span>${title}</span>`,
+      },
+      series: [
+        {
+          data: mapSource,
+          mapData: mapGeo,
+          name: 'Total',
+        },
+      ],
+    });
+  }, [data, mapGeo]);
 
   return (
-    <div>
-      <HighchartsReact
-        options={options}
-        highcharts={Highcharts}
-        constructorType={'mapChart'}
-      />
-    </div>
+    <HighchartsReact
+      options={options}
+      highcharts={Highcharts}
+      constructorType={'mapChart'}
+    />
   );
 }

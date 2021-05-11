@@ -1,6 +1,7 @@
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useEffect, useState } from 'react';
+import { levels } from '../../lib/constant/config';
 
 export default function BarChart({ data }) {
   const [option, setOption] = useState({
@@ -24,6 +25,28 @@ export default function BarChart({ data }) {
       },
     },
 
+    tooltip: {
+      formatter: function () {
+        return this.series.name === 'Interest'
+          ? this.series.name + ': ' + this.y
+          : '<b>' +
+              this.x +
+              '</b><br/>' +
+              this.series.name +
+              ': ' +
+              this.y +
+              '<br/>' +
+              'Total: ' +
+              this.point.stackTotal;
+      },
+    },
+
+    plotOptions: {
+      column: {
+        stacking: 'normal',
+      },
+    },
+
     credits: {
       enabled: false,
     },
@@ -35,7 +58,7 @@ export default function BarChart({ data }) {
     }
 
     const { skill, interest } = data;
-    const skillCategories = Object.keys(skill).map((key) => key);
+    const skillCategories = Object.keys(skill);
     const interestCategories = interest.map((item) => item.name);
     const categories = skillCategories.concat(
       interestCategories.filter((value) => !skillCategories.includes(value))
@@ -51,11 +74,24 @@ export default function BarChart({ data }) {
       }),
     };
 
+    const skills = new Array(5).fill({}).map((_, index) => {
+      const level = index + 1;
+      const skillData = categories.map((category) => {
+        const data = Object.entries(skill).find(([key, value]) => {
+          return category === key;
+        });
+        const target = !!!data
+          ? 0
+          : data[1].find((item) => item.level === level);
+        return !!!target ? 0 : target.amount;
+      });
+      return { name: levels[index], stack: 'skill', data: skillData };
+    });
 
-    
-    console.log(data, categories);
-
-    setOption({ xAxis: { categories: categories }, series: interests });
+    setOption({
+      xAxis: { categories: categories },
+      series: skills.concat(interests),
+    });
   }, [data]);
 
   return <HighchartsReact Highcharts={Highcharts} options={option} />;
