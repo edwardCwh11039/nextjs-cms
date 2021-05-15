@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Badge, Row, Dropdown } from 'antd';
 import {
   MenuUnfoldOutlined,
@@ -16,18 +16,101 @@ import apiServices from '../../lib/services/api-services';
 import storage from '../../lib/services/storage';
 import AppBreadCrumb from './breadcrumb';
 import SubMenu from 'antd/lib/menu/SubMenu';
+import { Routes } from '../../lib/constant/routes';
 
 const { Header, Sider, Content } = Layout;
+
+function renderMenu(role, route, parent = '') {
+  return route.map((item) => {
+    const key = `${item.label}_${item.path}`;
+    if (item.subNav && !!item.subNav.length) {
+      return (
+        <SubMenu key={key} icon={item.icon} title={item.label}>
+          {renderMenu(role, item.subNav, `${item.path}`)}
+        </SubMenu>
+      );
+    } else {
+      return (
+        <Menu.Item key={key} icon={item.icon} className="icon">
+          <Link
+            href={['/dashboard', role, parent, item.path]
+              .filter((item) => item !== '')
+              .join('/')}
+          >
+            {item.label}
+          </Link>
+        </Menu.Item>
+      );
+    }
+  });
+}
+
+function deepSearchRecordFactory(predicateFn, value, key) {
+  return function search(data, record = []) {
+    const headNode = data.slice(0, 1)[0];
+    const restNode = data.slice(1);
+
+    record.push(`${headNode.label}_${headNode.path}`);
+    if (predicateFn(headNode, value)) {
+      const hasIndexPage = headNode[key]?.find((item) => item.path === '');
+      const result = hasIndexPage
+        ? record.push(`${hasIndexPage.label}_${hasIndexPage.path}`)
+        : record;
+      return result;
+    }
+
+    if (headNode[key]) {
+      const res = search(headNode[key], record);
+
+      if (res) {
+        return record;
+      } else {
+        record.pop();
+      }
+    }
+
+    if (restNode.length) {
+      record.pop();
+
+      const res = search(restNode, record);
+
+      if (res) {
+        return record;
+      }
+    }
+    return null;
+  };
+}
+
+const fn = (data, value) => data.path === value;
+
+function menuConfig(route, value) {
+  const deepSearchRecordFn = deepSearchRecordFactory(fn, value, 'subNav');
+  const record = deepSearchRecordFn(route);
+  const defaultOpenKeys = record.slice(0, -1);
+  const defaultSelectedKeys = record.pop();
+
+  return { defaultOpenKeys, defaultSelectedKeys };
+}
 
 const AppLayout = (props) => {
   const { children } = props;
   const [collapsed, toggleCollapsed] = useState(false);
   const router = useRouter();
-  const role = storage.getRole() || router.pathname.split('/')[2];
   const paths = router.pathname.split('/');
-  const defaultSelectedKeys =
-    paths.length === 3 ? 'overview' : paths[paths.length - 1];
-  const defaultOpenKeys = paths[3] || '';
+  const role = storage.getRole() || paths[2];
+
+  const roleRoute = Routes[role];
+  const menu = renderMenu(role, roleRoute);
+
+  const { defaultOpenKeys, defaultSelectedKeys } = menuConfig(
+    roleRoute,
+    paths.length === 3 ? '' : paths[paths.length - 1]
+  );
+
+  useEffect(() => {
+    console.log(defaultOpenKeys, defaultSelectedKeys);
+  }, []);
 
   return (
     <Layout style={{ height: '100vh' }}>
@@ -44,43 +127,10 @@ const AppLayout = (props) => {
         <Menu
           theme="dark"
           mode="inline"
+          defaultOpenKeys={defaultOpenKeys}
           defaultSelectedKeys={defaultSelectedKeys}
-          defaultOpenKeys={[defaultOpenKeys]}
         >
-          <Menu.Item key="overview" icon={<ReadOutlined />} className="icon">
-            <Link href={`/dashboard/${role}`}>Home</Link>
-          </Menu.Item>
-          <SubMenu key="student" icon={<ReadOutlined />} title="Student">
-            <Menu.Item key="student" icon={<ReadOutlined />} className="icon">
-              <Link href={`/dashboard/${role}/student`}>Student List</Link>
-            </Menu.Item>
-          </SubMenu>
-
-          {role === 'manager' && (
-            <SubMenu key="course" icon={<ReadOutlined />} title="Course">
-              <Menu.Item key="course" icon={<ReadOutlined />} className="icon">
-                <Link href={`/dashboard/${role}/course`}>All Courses</Link>
-              </Menu.Item>
-              <Menu.Item
-                key="add-course"
-                icon={<ReadOutlined />}
-                className="icon"
-              >
-                <Link href={`/dashboard/${role}/course/add-course`}>
-                  Add Courses
-                </Link>
-              </Menu.Item>
-              <Menu.Item
-                key="edit-course"
-                icon={<ReadOutlined />}
-                className="icon"
-              >
-                <Link href={`/dashboard/${role}/course/edit-course`}>
-                  Edit Courses
-                </Link>
-              </Menu.Item>
-            </SubMenu>
-          )}
+          {menu}
         </Menu>
       </Sider>
       <Layout id="contentLayout">
