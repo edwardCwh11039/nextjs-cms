@@ -8,7 +8,6 @@ import { getPathByName } from '../../lib/util/routes';
 const AppBreadCrumb = ({ activePath, roleRoute }) => {
   const router = useRouter();
   const path = router.pathname;
-  const paths = path.split('/').splice(3);
   const root = '/' + path.split('/').splice(1).slice(0, 2).join('/');
   const role = activePath.splice(0, 1)[0];
   if (activePath.length === 0) {
@@ -17,12 +16,6 @@ const AppBreadCrumb = ({ activePath, roleRoute }) => {
   const routes = activePath
     .map((item) => getPathByName(roleRoute, item, activePath.length > 1))
     .flat();
-
-  useEffect(() => {
-    console.log(paths);
-    console.log(activePath);
-    console.log(routes);
-  }, []);
 
   return (
     <Breadcrumb style={{ margin: '0 16px', padding: 16 }}>

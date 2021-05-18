@@ -59,9 +59,6 @@ const AppLayout = (props) => {
   const key = activeKey.split('/');
   const defaultSelectedKeys = [key.pop()];
   const defaultOpenKeys = key;
-  useEffect(() => {
-    console.log(activePath, key, roleRoute);
-  }, []);
 
   return (
     <Layout style={{ height: '100vh' }}>
