@@ -16,13 +16,14 @@ import apiServices from '../../lib/services/api-services';
 import storage from '../../lib/services/storage';
 import AppBreadCrumb from './breadcrumb';
 import SubMenu from 'antd/lib/menu/SubMenu';
-import { Routes } from '../../lib/constant/routes';
+import { routes } from '../../lib/constant/routes';
+import { getActiveKeyPath, generateKey } from '../../lib/util/routes';
 
 const { Header, Sider, Content } = Layout;
 
 function renderMenu(role, route, parent = '') {
-  return route.map((item) => {
-    const key = `${item.label}_${item.path}`;
+  return route.map((item, index) => {
+    const key = generateKey(item, index);
     if (item.subNav && !!item.subNav.length) {
       return (
         <SubMenu key={key} icon={item.icon} title={item.label}>
@@ -45,54 +46,6 @@ function renderMenu(role, route, parent = '') {
   });
 }
 
-function deepSearchRecordFactory(predicateFn, value, key) {
-  return function search(data, record = []) {
-    const headNode = data.slice(0, 1)[0];
-    const restNode = data.slice(1);
-
-    record.push(`${headNode.label}_${headNode.path}`);
-    if (predicateFn(headNode, value)) {
-      const hasIndexPage = headNode[key]?.find((item) => item.path === '');
-      const result = hasIndexPage
-        ? record.push(`${hasIndexPage.label}_${hasIndexPage.path}`)
-        : record;
-      return result;
-    }
-
-    if (headNode[key]) {
-      const res = search(headNode[key], record);
-
-      if (res) {
-        return record;
-      } else {
-        record.pop();
-      }
-    }
-
-    if (restNode.length) {
-      record.pop();
-
-      const res = search(restNode, record);
-
-      if (res) {
-        return record;
-      }
-    }
-    return null;
-  };
-}
-
-const fn = (data, value) => data.path === value;
-
-function menuConfig(route, value) {
-  const deepSearchRecordFn = deepSearchRecordFactory(fn, value, 'subNav');
-  const record = deepSearchRecordFn(route);
-  const defaultOpenKeys = record.slice(0, -1);
-  const defaultSelectedKeys = record.pop();
-
-  return { defaultOpenKeys, defaultSelectedKeys };
-}
-
 const AppLayout = (props) => {
   const { children } = props;
   const [collapsed, toggleCollapsed] = useState(false);
@@ -100,16 +53,14 @@ const AppLayout = (props) => {
   const paths = router.pathname.split('/');
   const role = storage.getRole() || paths[2];
 
-  const roleRoute = Routes[role];
+  const roleRoute = routes[role];
   const menu = renderMenu(role, roleRoute);
-
-  const { defaultOpenKeys, defaultSelectedKeys } = menuConfig(
-    roleRoute,
-    paths.length === 3 ? '' : paths[paths.length - 1]
-  );
-
+  const { activePath, activeKey } = getActiveKeyPath(roleRoute);
+  const key = activeKey.split('/');
+  const defaultSelectedKeys = [key.pop()];
+  const defaultOpenKeys = key;
   useEffect(() => {
-    console.log(defaultOpenKeys, defaultSelectedKeys);
+    console.log(activePath, key, roleRoute);
   }, []);
 
   return (
@@ -192,7 +143,7 @@ const AppLayout = (props) => {
           </Row>
         </Header>
 
-        <AppBreadCrumb />
+        <AppBreadCrumb activePath={activePath} roleRoute={roleRoute} />
         <Content className="content-style">{children}</Content>
       </Layout>
     </Layout>

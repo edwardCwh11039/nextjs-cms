@@ -125,7 +125,7 @@ export default function Page({ id }) {
                 size="small"
                 pagination={false}
                 columns={columns}
-                dataSource={data?.schedule.classTime}
+                dataSource={new Array(1).fill({ id: 0 })}
               ></Table>
             )}
 
