@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Badge, Row, Dropdown } from 'antd';
+import { Layout, Menu, Badge, Row, Dropdown, Tabs } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -11,7 +11,6 @@ import {
 import Avatar from 'antd/lib/avatar/avatar';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-
 import apiServices from '../../lib/services/api-services';
 import storage from '../../lib/services/storage';
 import AppBreadCrumb from './breadcrumb';
@@ -19,6 +18,7 @@ import SubMenu from 'antd/lib/menu/SubMenu';
 import { routes } from '../../lib/constant/routes';
 import { getActiveKeyPath, generateKey } from '../../lib/util/routes';
 
+const { TabPane } = Tabs;
 const { Header, Sider, Content } = Layout;
 
 function renderMenu(role, route, parent = '') {
@@ -56,9 +56,9 @@ const AppLayout = (props) => {
   const roleRoute = routes[role];
   const menu = renderMenu(role, roleRoute);
   const { activePath, activeKey } = getActiveKeyPath(roleRoute);
-  const key = activeKey.split('/');
-  const defaultSelectedKeys = [key.pop()];
-  const defaultOpenKeys = key;
+  const keys = activeKey.split('/');
+  const defaultSelectedKeys = [keys.pop()];
+  const defaultOpenKeys = keys;
 
   return (
     <Layout style={{ height: '100vh' }}>
@@ -83,10 +83,13 @@ const AppLayout = (props) => {
       </Sider>
       <Layout id="contentLayout">
         <Header className="styledHeader">
+          {/* collapse toggle */}
           <span className="icon" onClick={() => toggleCollapsed(!collapsed)}>
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </span>
+
           <Row align="middle">
+            {/* message area*/}
             <Badge size="small" count={5} offset={[10, 0]}>
               <div className="icon">
                 <Dropdown
@@ -100,18 +103,27 @@ const AppLayout = (props) => {
                   placement="bottomRight"
                   trigger={['click']}
                   overlay={
-                    <Menu>
-                      <Menu.Item key="mail">Navigation One</Menu.Item>
-                      <Menu.Item key="app">Navigation Two</Menu.Item>
-                    </Menu>
-                  } //! Overlay WHAT!
+                    <Tabs>
+                      <TabPane tab="Tab 1" key="1">
+                        Content of Tab Pane 1
+                      </TabPane>
+                      <TabPane tab="Tab 2" key="2">
+                        Content of Tab Pane 2
+                      </TabPane>
+                      <TabPane tab="Tab 3" key="3">
+                        Content of Tab Pane 3
+                      </TabPane>
+                    </Tabs>
+                  }
                 >
                   <BellOutlined
                     style={{ fontSize: '24px', marginTop: '5px' }}
                   />
-                </Dropdown>{' '}
+                </Dropdown>
               </div>
             </Badge>
+
+            {/* user icon - profile / logout ... */}
             <div className="icon" style={{ marginLeft: '2em' }}>
               <Dropdown
                 overlay={
